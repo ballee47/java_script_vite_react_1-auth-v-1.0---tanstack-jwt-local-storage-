@@ -1,0 +1,1 @@
+// export { productsPlugin } from "./manifest"
