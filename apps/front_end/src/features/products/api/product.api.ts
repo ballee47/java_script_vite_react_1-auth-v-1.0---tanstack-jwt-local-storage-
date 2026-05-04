@@ -9,3 +9,4 @@ export const getProducts = async () => {
   const response = await httpClient.get("/products/");
   return response.data;
 };
+

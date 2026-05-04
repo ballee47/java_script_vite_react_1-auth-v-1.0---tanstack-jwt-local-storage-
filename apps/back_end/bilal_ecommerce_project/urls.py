@@ -8,7 +8,12 @@ from products.views import CategoryViewSet, ProductViewSet
 from django.conf import settings
 from django.conf.urls.static import static
 from .views import MeAPIView, register_user
-from rest_framework.authtoken.views import obtain_auth_token
+
+# ✅ JWT imports (IMPORTANT FIX)
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 # DRF router
 router = DefaultRouter()
@@ -21,7 +26,11 @@ urlpatterns = [
 
     # API routes
     path('api/', include(router.urls)),
-    path('api/token/', obtain_auth_token, name='api-login'),
+
+    # 🔐 JWT AUTH (FIXED)
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
     path('api/me/', MeAPIView.as_view(), name='me'),
     path('api/register/', register_user),
 ]

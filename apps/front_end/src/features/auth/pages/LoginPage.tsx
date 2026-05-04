@@ -1,53 +1,45 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { httpClient } from "@/infra/http/httpClient";
-import { useAuth } from "@/features/auth/app/AuthProvider";
+import { useLogin } from "@/features/auth/hooks/useAuthQueries";
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+
+  const { mutate: login, isPending } = useLogin();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
 
-    try {
-      setLoading(true);
-      setError(null);
+    setError(null);
 
-      const res = await httpClient.post("token/", {
-        username,
-        password,
-      });
-
-      // ✅ centralized auth (context handles storage + state)
-      login(username, res.data.token);
-
-      // ✅ replace prevents back-navigation to login
-        navigate("/dashboard", { replace: true });
-    } catch (err) {
-      setError("Invalid username or password");
-    } finally {
-      setLoading(false);
-    }
+    login(
+      { username, password }, // adjust if backend expects "username"
+      {
+        onSuccess: () => {
+          navigate("/dashboard", { replace: true });
+        },
+        onError: () => {
+          setError("Invalid username or password");
+        },
+      }
+    );
   };
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-slate-950 overflow-hidden">
 
-      {/* 🔥 HERO BACKGROUND GLOW */}
+      {/* BACKGROUND GLOW */}
       <div className="absolute inset-0">
         <div className="absolute w-[500px] h-[500px] bg-blue-600/30 rounded-full blur-[120px] top-[-120px] left-[-120px]" />
         <div className="absolute w-[500px] h-[500px] bg-purple-600/30 rounded-full blur-[120px] bottom-[-120px] right-[-120px]" />
         <div className="absolute w-[400px] h-[400px] bg-cyan-500/20 rounded-full blur-[120px] top-[30%] left-[40%]" />
       </div>
 
-      {/* TOP NAV BUTTONS */}
+      {/* TOP BUTTONS */}
       <div className="absolute top-5 left-5 flex gap-3 z-20">
 
         <button
@@ -105,15 +97,15 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={isPending}
               className="w-full py-3 rounded-lg bg-blue-600 hover:bg-blue-700 active:scale-[0.98] transition font-semibold text-white disabled:opacity-50"
             >
-              {loading ? "Signing in..." : "Sign In"}
+              {isPending ? "Signing in..." : "Sign In"}
             </button>
 
           </form>
 
-          {/* EXTRA LINKS */}
+          {/* LINKS */}
           <div className="mt-6 flex justify-between text-sm text-white/60">
             <span className="hover:text-white cursor-pointer">
               Forgot password?

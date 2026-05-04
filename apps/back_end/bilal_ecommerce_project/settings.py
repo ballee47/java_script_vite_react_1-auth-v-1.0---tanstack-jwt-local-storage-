@@ -21,12 +21,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     'rest_framework',
     'rest_framework.authtoken',
-
     'corsheaders',
-
     'accounts',
     'products',
     'orders',
@@ -106,9 +103,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # DRF
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
 }
 
 load_dotenv()
@@ -122,3 +119,9 @@ cloudinary.config(
     secure=True
 
 )
+
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+]
+

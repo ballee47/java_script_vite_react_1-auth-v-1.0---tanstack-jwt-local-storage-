@@ -22,7 +22,7 @@ export default function SignupPage() {
       setError(null);
 
       // 🔥 API CALL (adjust endpoint if needed)
-      const res = await httpClient.post("register/", {
+      const res = await httpClient.post("api/register/", {
         username,
         email,
         password,
@@ -31,7 +31,10 @@ export default function SignupPage() {
       console.log("SIGNUP SUCCESS:", res.data);
 
       // 🔥 auto-login after signup (SaaS standard UX)
-      login(username, res.data.token);
+    login({
+  username,
+  password, // if needed OR remove if not required
+});
 
       // redirect
       navigate("/products");

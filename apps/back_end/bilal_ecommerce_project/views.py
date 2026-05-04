@@ -64,7 +64,7 @@ def register_user(request):
     username = data.get("username")
     password = data.get("password")
     email = data.get("email")
-
+    
     if User.objects.filter(username=username).exists():
         return Response({"message": "User already exists"}, status=400)
 

@@ -1,44 +1,52 @@
-import { NavLink, useNavigate } from "react-router-dom"
-import { useState, useEffect, useRef } from "react"
-import { useAuth } from "@/features/auth/app/AuthProvider"
-import { CartIcon } from "@/features/cart"
+import { NavLink, useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { useMe, useLogout } from "@/features/auth/hooks/useAuthQueries";
+import { CartIcon } from "@/features/cart";
 
 type NavbarProps = {
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>
-}
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
 export default function Navbar({ setOpen }: NavbarProps) {
-  const navigate = useNavigate()
-  const { user, isAuthenticated, logout } = useAuth()
+  const navigate = useNavigate();
 
-  const [openUserMenu, setOpenUserMenu] = useState(false)
-  const [search, setSearch] = useState("")
-  const menuRef = useRef<HTMLDivElement>(null)
+  // ✅ React Query auth
+  const { data: user } = useMe();
+  const { mutate: logout } = useLogout();
+
+  const isAuthenticated = !!user;
+
+  const [openUserMenu, setOpenUserMenu] = useState(false);
+  const [search, setSearch] = useState("");
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setOpenUserMenu(false)
+        setOpenUserMenu(false);
       }
-    }
+    };
 
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     `text-white px-4 py-2 rounded-lg text-[18px] font-medium transition-all duration-200 
-    ${isActive ? "bg-white/20" : "hover:bg-white/20"}`
+    ${isActive ? "bg-white/20" : "hover:bg-white/20"}`;
 
   const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-  }
+    e.preventDefault();
+  };
 
   const handleLogout = () => {
-    logout()
-    setOpenUserMenu(false)
-    navigate("/login", { replace: true })
-  }
+    logout(undefined, {
+      onSuccess: () => {
+        setOpenUserMenu(false);
+        navigate("/login", { replace: true });
+      },
+    });
+  };
 
   return (
     <div className="h-[70px] flex items-center justify-between px-8 text-white shadow-lg bg-gradient-to-r from-slate-800 to-slate-900">
@@ -61,7 +69,6 @@ export default function Navbar({ setOpen }: NavbarProps) {
 
       {/* CENTER */}
       <div className="flex items-center gap-4">
-
         <NavLink to="/" className={linkClass}>
           Home
         </NavLink>
@@ -78,19 +85,19 @@ export default function Navbar({ setOpen }: NavbarProps) {
             className="px-3 py-2 rounded-lg text-black w-48 focus:w-64 transition-all duration-300 outline-none"
           />
         </form>
-
       </div>
 
       {/* RIGHT */}
       <div className="flex items-center gap-4">
 
-        {/* CART ICON (only when logged in) */}
+        {/* CART */}
         {isAuthenticated && (
           <div className="cursor-pointer">
             <CartIcon />
           </div>
         )}
 
+        {/* AUTH BUTTONS */}
         {!isAuthenticated ? (
           <>
             <NavLink to="/login" className={linkClass}>
@@ -104,13 +111,15 @@ export default function Navbar({ setOpen }: NavbarProps) {
         ) : (
           <div className="relative" ref={menuRef}>
 
+            {/* USER BUTTON */}
             <div
               onClick={() => setOpenUserMenu(prev => !prev)}
               className="cursor-pointer px-4 py-2 rounded-xl bg-white/10 backdrop-blur-md font-semibold text-[18px]"
             >
-              👤 {user || "User"}
+              👤 {user?.username || "User"}
             </div>
 
+            {/* DROPDOWN */}
             <div
               className={`absolute right-0 top-[60px] w-64 bg-white text-black rounded-xl shadow-2xl p-4 z-[999]
               transition-all duration-200
@@ -121,7 +130,7 @@ export default function Navbar({ setOpen }: NavbarProps) {
             >
               <div className="mb-3">
                 <div className="font-bold text-[16px]">
-                  {user}
+                  {user?.username}
                 </div>
               </div>
 
@@ -137,8 +146,7 @@ export default function Navbar({ setOpen }: NavbarProps) {
 
           </div>
         )}
-
       </div>
     </div>
-  )
+  );
 }
