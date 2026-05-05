@@ -1,10 +1,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
+import { httpClient } from "@/infra/http/httpClient";
 import { uploadImage } from "@/infra/storage/cloudinary";
 import { queryKeys } from "@/query/keys";
 
-
-
+export type Product = {
+  id: number;
+  name: string;
+  price: number;
+  image: string;
+};
 
 type ProductForm = {
   name: string;
@@ -22,22 +26,20 @@ export const useCreateProduct = () => {
     }: {
       form: ProductForm;
       file: File;
-    }) => {
-      const imageUrl = await uploadImage(file); // Cloudinary
+    }): Promise<Product> => {
+      if (!file) throw new Error("Image is required");
 
-      const res = await axios.post(
-        "http://127.0.0.1:8000/api/products/",
-        {
-          ...form,
-          image: imageUrl,
-        }
-      );
+      const imageUrl = await uploadImage(file);
+
+      const res = await httpClient.post("/api/products/", {
+        ...form,
+        image: imageUrl,
+      });
 
       return res.data;
     },
 
     onSuccess: () => {
-      // 🔥 refresh products list automatically
       queryClient.invalidateQueries({
         queryKey: queryKeys.products,
       });
