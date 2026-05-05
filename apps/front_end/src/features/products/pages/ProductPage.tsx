@@ -7,6 +7,7 @@ type Product = {
   name: string;
   price: number;
   image: string;
+  
 };
 
 export default function ProductPage() {
