@@ -1,6 +1,5 @@
+// src/query/keys.ts
 export const queryKeys = {
-  products: ["products"] as const,
-  product: (id: number) => ["products", id] as const,
-
-  categories: ["categories"] as const,
+  products: ["products"],
+  product: (id: number) => ["product", id],
 };
