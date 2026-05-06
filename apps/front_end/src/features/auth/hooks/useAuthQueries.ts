@@ -55,6 +55,7 @@ export const useLogout = () => {
       localStorage.removeItem("refresh");
 
       queryClient.removeQueries({ queryKey: ["me"] });
+      
     },
   });
 };
