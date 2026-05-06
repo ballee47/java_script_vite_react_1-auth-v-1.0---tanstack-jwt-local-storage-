@@ -21,5 +21,5 @@ export function useAuth() {
     // server state
     user: meQuery.data,
     isUserLoading: meQuery.isLoading,
-  };
+    };
 }
