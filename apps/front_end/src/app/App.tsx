@@ -1,13 +1,11 @@
+// src/app/App.tsx
 import { BrowserRouter } from "react-router-dom";
-import Providers from "./providers";
 import { AppRoutes } from "@/routes";
 
 export default function App() {
   return (
     <BrowserRouter>
-      <Providers>
-        <AppRoutes />
-      </Providers>
+      <AppRoutes /> {/* ✅ no Providers here — already in main.tsx */}
     </BrowserRouter>
   );
 }

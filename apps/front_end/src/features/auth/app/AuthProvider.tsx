@@ -1,77 +1,43 @@
-import { createContext, useContext, useEffect, useState } from "react";
-
-type AuthContextType = {
-  user: string | null;
-  token: string | null;
-  isAuthenticated: boolean;
-  loadingAuth: boolean;
-  login: (username: string, token: string) => void;
-  logout: () => void;
-};
-
-const AuthContext = createContext<AuthContextType | null>(null);
+// src/features/auth/app/AuthProvider.tsx
+import { useEffect, useState } from "react";
+import { AuthContext } from "../context/AuthContext";
+import { useMe } from "../hooks/useAuthQueries";
+import { tokenStorage } from "@/infra/storage/localStorage";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<string | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+  const { isLoading, data: user } = useMe();
 
-  // 🔥 prevents UI flicker before hydration completes
-  const [loadingAuth, setLoadingAuth] = useState(true);
+  // ✅ local state — updates instantly when token disappears
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    tokenStorage.hasAccessToken()
+  );
 
-  // 🔄 Hydrate auth once on app start
+  // ✅ sync with user data from React Query
   useEffect(() => {
-    const savedUser = localStorage.getItem("username");
-    const savedToken = localStorage.getItem("token");
-
-    if (savedUser && savedToken) {
-      setUser(savedUser);
-      setToken(savedToken);
+    if (user) {
+      setIsAuthenticated(true);
+    } else if (!isLoading) {
+      setIsAuthenticated(false);
     }
+  }, [user, isLoading]);
 
-    setLoadingAuth(false);
-  }, []);
-
-  // 🔐 Login
-  const login = (username: string, authToken: string) => {
-    localStorage.setItem("username", username);
-    localStorage.setItem("token", authToken);
-
-    setUser(username);
-    setToken(authToken);
-  };
-
-  // 🚪 Logout
-  const logout = () => {
-    localStorage.removeItem("username");
-    localStorage.removeItem("token");
-
-    setUser(null);
-    setToken(null);
-  };
-
-  const isAuthenticated = !!token;
+  // ✅ loading screen — prevents UI flash on app start
+  if (isLoading && tokenStorage.hasAccessToken()) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-900">
+        <p className="text-white">Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <AuthContext.Provider
       value={{
-        user,
-        token,
-        isAuthenticated,
-        loadingAuth,
-        login,
-        logout,
+        isAuthenticated,      // ✅ from local state — updates instantly
+        isLoadingAuth: isLoading,
       }}
     >
       {children}
     </AuthContext.Provider>
   );
-}
-
-// 🧠 Safe hook
-export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) {
-    throw new Error("useAuth must be used inside AuthProvider");
-  }
-  return ctx;
 }

@@ -1,23 +1,21 @@
+// src/app/providers.tsx
 import { ReactNode } from "react";
-import { AuthProvider } from "@/features/auth/app/AuthProvider";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-
-
+import { AuthProvider } from "@/features/auth/app/AuthProvider";
+import { queryClient } from "@/query/client"; // ✅ import from central place
 
 type ProvidersProps = {
   children: ReactNode;
 };
 
-// create query client ONCE
-const queryClient = new QueryClient();
-
 export default function Providers({ children }: ProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>{children}</AuthProvider>
-        <ReactQueryDevtools initialIsOpen={false} />
-
+      <AuthProvider>
+        {children}
+        <ReactQueryDevtools initialIsOpen={false} /> {/* ✅ inside AuthProvider */}
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

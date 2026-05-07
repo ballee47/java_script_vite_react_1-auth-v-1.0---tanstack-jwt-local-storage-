@@ -1,61 +1,45 @@
+// src/features/auth/hooks/useAuthQueries.ts
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { httpClient } from "@/infra/http/httpClient";
+import { tokenStorage, clearAllStorage } from "@/infra/storage/localStorage";
+import { loginApi, fetchMeApi } from "../api/login.api";
+import { queryKeys } from "@/query/keys";
 
 /* ---------------- LOGIN ---------------- */
-const login = async (data: { username: string; password: string }) => {
-  const res = await httpClient.post("/api/token/", data);
-  return res.data;
-};
-
 export const useLogin = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: login,
-
+    mutationFn: loginApi,
     onSuccess: (data) => {
-      // store JWT tokens
-      localStorage.setItem("access", data.access);
-      localStorage.setItem("refresh", data.refresh);
-
-      // refresh user
-      queryClient.invalidateQueries({ queryKey: ["me"] });
+      tokenStorage.setTokens(data.access, data.refresh);
+      // ✅ invalidate AND refetch immediately
+      queryClient.invalidateQueries({ queryKey: queryKeys.me });
+      queryClient.refetchQueries({ queryKey: queryKeys.me }); // ✅ added
     },
   });
 };
 
 /* ---------------- ME ---------------- */
-const fetchMe = async () => {
-  const res = await httpClient.get("/api/me/");
-  return res.data;
-};
-
 export const useMe = () => {
   return useQuery({
-    queryKey: ["me"],
-    queryFn: fetchMe,
+    queryKey: queryKeys.me,
+    queryFn: fetchMeApi,
     retry: false,
-    enabled: !!localStorage.getItem("access"),
+    staleTime: 1000 * 60 * 5,              // ✅ 5 mins
+    enabled: tokenStorage.hasAccessToken(),
   });
 };
 
 /* ---------------- LOGOUT ---------------- */
-const logout = async () => {
-  return Promise.resolve();
-};
-
 export const useLogout = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: logout,
-
+    mutationFn: async () => Promise.resolve(),
     onSuccess: () => {
-      localStorage.removeItem("access");
-      localStorage.removeItem("refresh");
-
-      queryClient.removeQueries({ queryKey: ["me"] });
-      
+      clearAllStorage();
+      queryClient.resetQueries({ queryKey: queryKeys.me });
+      queryClient.clear(); // ✅ wipe full cache
     },
   });
 };

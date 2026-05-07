@@ -1,32 +1,18 @@
-import { createContext, useState, ReactNode } from "react"
+// src/features/auth/context/AuthContext.ts
+import { createContext } from "react";
 
-type User = {
-  username: string
-  email?: string
-}
+// ─────────────────────────────────────────
+// TYPE
+// ─────────────────────────────────────────
+export type AuthContextType = {
+  isAuthenticated: boolean;
+  isLoadingAuth: boolean;
+};
 
-type AuthContextType = {
-  user: User | null
-  login: (user: User) => void
-  logout: () => void
-}
-
-export const AuthContext = createContext<AuthContextType | null>(null)
-
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-
-  const login = (user: User) => {
-    setUser(user)
-  }
-
-  const logout = () => {
-    setUser(null)
-  }
-
-  return (
-    <AuthContext.Provider value={{ user, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  )
-}
+// ─────────────────────────────────────────
+// CONTEXT
+// ─────────────────────────────────────────
+export const AuthContext = createContext<AuthContextType>({
+  isAuthenticated: false,
+  isLoadingAuth: true,
+});

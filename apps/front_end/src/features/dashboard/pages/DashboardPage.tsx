@@ -1,9 +1,10 @@
+// src/features/dashboard/pages/DashboardPage.tsx
 import { useEffect, useState } from "react";
 import { useDashboard } from "../hooks/useDashboard";
-import { useAuth } from "@/features/auth/app/AuthProvider";
+import { useAuth } from "@/features/auth/hooks/useAuth"; // ✅ correct path
 
 export default function DashboardPage() {
-  const { user } = useAuth();
+  const { user } = useAuth(); // ✅ now works correctly
   const { data, loading } = useDashboard();
   const [index, setIndex] = useState(0);
 
@@ -43,7 +44,7 @@ export default function DashboardPage() {
         {/* dark overlay */}
         <div className="absolute inset-0 bg-black/60" />
 
-        {/* glow effects (merged from original design) */}
+        {/* glow effects */}
         <div className="absolute inset-0">
           <div className="absolute w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px] top-[-120px] left-[-120px]" />
           <div className="absolute w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px] bottom-[-120px] right-[-120px]" />
@@ -52,7 +53,8 @@ export default function DashboardPage() {
         {/* HERO TEXT */}
         <div className="relative z-10 text-center px-4">
           <h1 className="text-4xl font-bold">
-            Welcome back, {user || data.user}
+            {/* ✅ user?.username from useAuth, fallback to data.user */}
+            Welcome back, {user?.username || data.user}
           </h1>
           <p className="text-white/60 mt-3">
             Here is your dashboard overview
@@ -62,30 +64,23 @@ export default function DashboardPage() {
 
       {/* STATS SECTION */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-8">
-
         <div className="bg-white/10 p-6 rounded-xl">
           💰 Revenue: ${data.stats.revenue}
         </div>
-
         <div className="bg-white/10 p-6 rounded-xl">
           📦 Orders: {data.stats.orders}
         </div>
-
         <div className="bg-white/10 p-6 rounded-xl">
           👤 Users: {data.stats.users}
         </div>
-
       </div>
 
       {/* PRODUCTS SECTION */}
       <div className="px-8 pb-12">
-
         <h2 className="text-xl mb-4 font-semibold">
           Products
         </h2>
-
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
           {data.products.map((p) => (
             <div
               key={p.id}
@@ -95,9 +90,7 @@ export default function DashboardPage() {
               <p className="text-white/60">{p.price}</p>
             </div>
           ))}
-
         </div>
-
       </div>
 
     </div>

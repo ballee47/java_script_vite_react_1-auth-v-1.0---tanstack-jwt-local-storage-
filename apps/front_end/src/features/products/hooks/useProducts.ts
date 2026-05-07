@@ -1,15 +1,11 @@
+// src/features/products/hooks/useProducts.ts
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { queryKeys } from "@/query/keys";
+import { getProductsApi } from "../api/product.api"; // ✅ import from api file
 
 export const useProducts = () => {
   return useQuery({
     queryKey: queryKeys.products,
-    queryFn: async () => {
-      const { data } = await axios.get(
-        "http://127.0.0.1:8000/api/products/"
-      );
-      return data;
-    },
+    queryFn: getProductsApi, // ✅ clean — just pass the function
   });
 };

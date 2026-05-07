@@ -1,16 +1,16 @@
+// src/features/auth/pages/SignupPage.tsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { httpClient } from "@/infra/http/httpClient";
-import { useAuth } from "../hooks/useAuth";
+import { signupApi } from "../api/login.api";       // ✅ use api file
+import { useLogin } from "../hooks/useAuthQueries"; // ✅ use hook directly
 
 export default function SignupPage() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { mutateAsync: loginMutate } = useLogin(); // ✅ mutateAsync for awaiting
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -21,27 +21,22 @@ export default function SignupPage() {
       setLoading(true);
       setError(null);
 
-      // 🔥 API CALL (adjust endpoint if needed)
-      const res = await httpClient.post("api/register/", {
-        username,
-        email,
-        password,
-      });
+      // ✅ step 1 — signup
+      await signupApi({ username, email, password });
 
-      console.log("SIGNUP SUCCESS:", res.data);
+      // ✅ step 2 — auto login and wait for it fully
+      await loginMutate({ username, password });
 
-      // 🔥 auto-login after signup (SaaS standard UX)
-    login({
-  username,
-  password, // if needed OR remove if not required
-});
+      // ✅ step 3 — wait for AuthContext + useMe to update
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
-      // redirect
-      navigate("/products");
+      // ✅ step 4 — redirect to dashboard
+      navigate("/dashboard", { replace: true });
 
     } catch (err: any) {
-      console.error(err);
-      setError("Signup failed. Try again.");
+      console.error("FULL ERROR:", err?.response?.data);
+      const message = err?.response?.data?.message || "Signup failed. Try again.";
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -59,7 +54,6 @@ export default function SignupPage() {
 
       {/* CARD */}
       <div className="relative z-10 w-full max-w-md mx-4">
-
         <div className="bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl p-8">
 
           <h1 className="text-3xl font-bold text-white text-center">
@@ -123,13 +117,12 @@ export default function SignupPage() {
             </span>
           </p>
 
-<button
-  onClick={() => navigate("/")}
-  className="w-full mt-4 py-2 rounded-lg border border-white/20 text-white hover:bg-white/10 transition"
->
-  Go to Home
-</button>
-
+          <button
+            onClick={() => navigate("/")}
+            className="w-full mt-4 py-2 rounded-lg border border-white/20 text-white hover:bg-white/10 transition"
+          >
+            Go to Home
+          </button>
 
         </div>
       </div>

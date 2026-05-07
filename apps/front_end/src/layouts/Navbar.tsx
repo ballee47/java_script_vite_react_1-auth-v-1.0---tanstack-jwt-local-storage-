@@ -1,6 +1,7 @@
+// src/layouts/Navbar.tsx
 import { NavLink, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
-import { useMe, useLogout } from "@/features/auth/hooks/useAuthQueries";
+import { useAuth } from "@/features/auth/hooks/useAuth"; // ✅ single import
 import { CartIcon } from "@/features/cart";
 
 type NavbarProps = {
@@ -10,23 +11,20 @@ type NavbarProps = {
 export default function Navbar({ setOpen }: NavbarProps) {
   const navigate = useNavigate();
 
-  // ✅ React Query auth
-  const { data: user } = useMe();
-  const { mutate: logout } = useLogout();
-
-  const isAuthenticated = !!user;
+  // ✅ single hook — replaces useMe + useLogout separately
+  const { user, isAuthenticated, logout } = useAuth();
 
   const [openUserMenu, setOpenUserMenu] = useState(false);
   const [search, setSearch] = useState("");
   const menuRef = useRef<HTMLDivElement>(null);
 
+  // close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setOpenUserMenu(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
@@ -37,16 +35,21 @@ export default function Navbar({ setOpen }: NavbarProps) {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    // TODO: implement search
   };
 
-  const handleLogout = () => {
-    logout(undefined, {
-      onSuccess: () => {
-        setOpenUserMenu(false);
+  // ✅ clean logout handler
+ const handleLogout = () => {
+  logout(undefined, {
+    onSuccess: () => {
+      setOpenUserMenu(false);
+      // ✅ force navigate AFTER state clears
+      setTimeout(() => {
         navigate("/login", { replace: true });
-      },
-    });
-  };
+      }, 100);
+    },
+  });
+};
 
   return (
     <div className="h-[70px] flex items-center justify-between px-8 text-white shadow-lg bg-gradient-to-r from-slate-800 to-slate-900">
@@ -90,20 +93,19 @@ export default function Navbar({ setOpen }: NavbarProps) {
       {/* RIGHT */}
       <div className="flex items-center gap-4">
 
-        {/* CART */}
-        {isAuthenticated && (
+        {/* CART — only when logged in */}
+        {isAuthenticated && ( // ✅ from useAuth
           <div className="cursor-pointer">
             <CartIcon />
           </div>
         )}
 
         {/* AUTH BUTTONS */}
-        {!isAuthenticated ? (
+        {!isAuthenticated ? ( // ✅ from useAuth
           <>
             <NavLink to="/login" className={linkClass}>
               Sign In
             </NavLink>
-
             <NavLink to="/signup" className={linkClass}>
               Sign Up
             </NavLink>
@@ -116,7 +118,7 @@ export default function Navbar({ setOpen }: NavbarProps) {
               onClick={() => setOpenUserMenu(prev => !prev)}
               className="cursor-pointer px-4 py-2 rounded-xl bg-white/10 backdrop-blur-md font-semibold text-[18px]"
             >
-              👤 {user?.username || "User"}
+              👤 {user?.username || "User"} {/* ✅ from useAuth */}
             </div>
 
             {/* DROPDOWN */}
@@ -130,7 +132,10 @@ export default function Navbar({ setOpen }: NavbarProps) {
             >
               <div className="mb-3">
                 <div className="font-bold text-[16px]">
-                  {user?.username}
+                  {user?.username} {/* ✅ from useAuth */}
+                </div>
+                <div className="text-sm text-gray-500">
+                  {user?.email} {/* ✅ now available from MeResponse */}
                 </div>
               </div>
 

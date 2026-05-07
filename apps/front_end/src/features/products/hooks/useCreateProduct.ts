@@ -1,24 +1,16 @@
+// src/features/products/hooks/useCreateProduct.ts
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import { uploadImage } from "@/infra/storage/cloudinary";
+import { createProductApi, Product } from "../api/product.api"; // ✅
 import { queryKeys } from "@/query/keys";
 
-type ProductForm = {
-  name: string;
-  price: number;
-  description?: string;
-};
-
 type CreateProductInput = {
-  form: ProductForm;
+  form: {
+    name: string;
+    price: number;
+    description?: string;
+  };
   file: File;
-};
-
-type Product = {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
 };
 
 export const useCreateProduct = () => {
@@ -28,17 +20,11 @@ export const useCreateProduct = () => {
     mutationFn: async ({ form, file }) => {
       if (!file) throw new Error("Image file is required");
 
+      // 1. upload image to cloudinary
       const imageUrl = await uploadImage(file);
 
-      const { data } = await axios.post<Product>(
-        "http://127.0.0.1:8000/api/products/",
-        {
-          ...form,
-          image: imageUrl,
-        }
-      );
-
-      return data;
+      // 2. create product with httpClient (token auto attached) ✅
+      return createProductApi({ ...form, image: imageUrl });
     },
 
     onSuccess: () => {

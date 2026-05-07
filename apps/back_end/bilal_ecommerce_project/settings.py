@@ -1,15 +1,17 @@
+# apps/back_end/bilal_ecommerce_project/settings.py
+
 import os
 from pathlib import Path
-from dotenv import load_dotenv
 import cloudinary
+from dotenv import load_dotenv
 
-
+# ✅ load_dotenv() FIRST — before any os.getenv()
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-# ✅ Secret key from .env
+# ✅ now these will work correctly
 SECRET_KEY = os.getenv("SECRET_KEY")
-
 DEBUG = True
 ALLOWED_HOSTS = []
 
@@ -22,7 +24,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'rest_framework.authtoken',
+    # ❌ removed — 'rest_framework.authtoken' not needed with JWT
     'corsheaders',
     'accounts',
     'products',
@@ -37,7 +39,7 @@ INSTALLED_APPS = [
 # Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'corsheaders.middleware.CorsMiddleware',  # ✅ moved up
+    'corsheaders.middleware.CorsMiddleware',  # ✅ stays at top
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -90,38 +92,31 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# ✅ STATIC (React build)
+# Static
 STATIC_URL = '/static/'
-
 STATICFILES_DIRS = []
 
-# ✅ Optional (only if you still use local media)
+# Media
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# DRF
+# ✅ DRF — JWT only
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
 }
 
-load_dotenv()
-
-
-# ✅ Cloudinary (from .env)
+# ✅ Cloudinary — from .env
 cloudinary.config(
     cloud_name=os.getenv("CLOUDINARY_NAME"),
     api_key=os.getenv("CLOUDINARY_API_KEY"),
     api_secret=os.getenv("CLOUDINARY_API_SECRET"),
     secure=True
-
 )
-
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
 ]
-

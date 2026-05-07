@@ -1,3 +1,4 @@
+// src/app/main.tsx
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
@@ -12,7 +13,7 @@ if (!rootElement) {
 
 ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
-    <Providers>
+    <Providers>   {/* ✅ only ONE wrap here */}
       <App />
     </Providers>
   </React.StrictMode>

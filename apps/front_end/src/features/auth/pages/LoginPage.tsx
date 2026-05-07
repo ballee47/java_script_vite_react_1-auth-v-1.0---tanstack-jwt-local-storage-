@@ -1,33 +1,33 @@
+// src/features/auth/pages/LoginPage.tsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLogin } from "@/features/auth/hooks/useAuthQueries";
 
 export default function LoginPage() {
   const navigate = useNavigate();
-
-  const { mutate: login, isPending } = useLogin();
+  const { mutateAsync: loginMutate, isPending } = useLogin(); // ✅ mutateAsync
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  
+const handleLogin = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError(null);
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
+  try {
+    await loginMutate({ username, password });
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    navigate("/dashboard", { replace: true });
 
-    setError(null);
-
-    login(
-      { username, password }, // adjust if backend expects "username"
-      {
-        onSuccess: () => {
-          navigate("/dashboard", { replace: true });
-        },
-        onError: () => {
-          setError("Invalid username or password");
-        },
-      }
-    );
-  };
+  } catch (err: any) {                           // ✅ was catch {}
+    const message =
+      err?.response?.data?.detail ||             // ✅ Django JWT error key
+      err?.response?.data?.message ||            // ✅ custom error key
+      "Invalid username or password";            // ✅ fallback
+    setError(message);                           // ✅ shows on screen
+  }
+};
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-slate-950 overflow-hidden">
@@ -41,26 +41,22 @@ export default function LoginPage() {
 
       {/* TOP BUTTONS */}
       <div className="absolute top-5 left-5 flex gap-3 z-20">
-
         <button
           onClick={() => navigate("/")}
           className="px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition"
         >
           🏠 Home
         </button>
-
         <button
           onClick={() => navigate(-1)}
           className="px-4 py-2 rounded-lg bg-red-500/80 text-white hover:bg-red-600 transition"
         >
           ❌ Cancel
         </button>
-
       </div>
 
       {/* LOGIN CARD */}
       <div className="relative z-10 w-full max-w-md mx-4">
-
         <div className="bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl p-8">
 
           <h1 className="text-3xl font-bold text-white text-center">
@@ -110,8 +106,10 @@ export default function LoginPage() {
             <span className="hover:text-white cursor-pointer">
               Forgot password?
             </span>
-
-            <span className="hover:text-white cursor-pointer">
+            <span
+              onClick={() => navigate("/signup")}
+              className="hover:text-white cursor-pointer"
+            >
               Create account
             </span>
           </div>
@@ -121,7 +119,6 @@ export default function LoginPage() {
         <p className="text-center text-white/40 text-xs mt-6">
           © 2026 SaaS Store. All rights reserved.
         </p>
-
       </div>
     </div>
   );
