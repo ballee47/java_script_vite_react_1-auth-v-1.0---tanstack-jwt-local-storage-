@@ -7,7 +7,7 @@ const KEYS = {
   ACCESS_TOKEN: "access",
   REFRESH_TOKEN: "refresh",
   USERNAME: "username",
-} as const;
+} as const ;
 
 // ─────────────────────────────────────────
 // TOKEN STORAGE
@@ -16,29 +16,29 @@ export const tokenStorage = {
 
   // GET
   getAccessToken: (): string | null =>
-    localStorage.getItem(KEYS.ACCESS_TOKEN),
+    sessionStorage.getItem(KEYS.ACCESS_TOKEN),
 
   getRefreshToken: (): string | null =>
-    localStorage.getItem(KEYS.REFRESH_TOKEN),
+    sessionStorage.getItem(KEYS.REFRESH_TOKEN),
 
   // SET
   setAccessToken: (token: string): void =>
-    localStorage.setItem(KEYS.ACCESS_TOKEN, token),
+    sessionStorage.setItem(KEYS.ACCESS_TOKEN, token),
 
   setTokens: (access: string, refresh: string): void => {
-    localStorage.setItem(KEYS.ACCESS_TOKEN, access);
-    localStorage.setItem(KEYS.REFRESH_TOKEN, refresh);
+    sessionStorage.setItem(KEYS.ACCESS_TOKEN, access);
+    sessionStorage.setItem(KEYS.REFRESH_TOKEN, refresh);
   },
 
   // REMOVE
   clearTokens: (): void => {
-    localStorage.removeItem(KEYS.ACCESS_TOKEN);
-    localStorage.removeItem(KEYS.REFRESH_TOKEN);
+    sessionStorage.removeItem(KEYS.ACCESS_TOKEN);
+    sessionStorage.removeItem(KEYS.REFRESH_TOKEN);
   },
 
   // CHECK
   hasAccessToken: (): boolean =>
-    !!localStorage.getItem(KEYS.ACCESS_TOKEN),
+    !!sessionStorage.getItem(KEYS.ACCESS_TOKEN),
 };
 
 // ─────────────────────────────────────────
@@ -47,13 +47,13 @@ export const tokenStorage = {
 export const userStorage = {
 
   getUsername: (): string | null =>
-    localStorage.getItem(KEYS.USERNAME),
+    sessionStorage.getItem(KEYS.USERNAME),
 
   setUsername: (username: string): void =>
-    localStorage.setItem(KEYS.USERNAME, username),
+    sessionStorage.setItem(KEYS.USERNAME, username),
 
   clearUsername: (): void =>
-    localStorage.removeItem(KEYS.USERNAME),
+    sessionStorage.removeItem(KEYS.USERNAME),
 };
 
 // ─────────────────────────────────────────
