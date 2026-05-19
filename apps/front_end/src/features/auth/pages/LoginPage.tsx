@@ -16,16 +16,20 @@ const handleLogin = async (e: React.FormEvent) => {
   setError(null);
 
   try {
-    await loginMutate({ username, password });
+    console.log("Attempting login with:", { username, password });
+    const response = await loginMutate({ username, password });
+    console.log("Login response:", response);
     await new Promise((resolve) => setTimeout(resolve, 300));
     navigate("/dashboard", { replace: true });
 
-  } catch (err: any) {                           // ✅ was catch {}
+  } catch (err: any) {
+    console.error("Login error:", err);
     const message =
-      err?.response?.data?.detail ||             // ✅ Django JWT error key
-      err?.response?.data?.message ||            // ✅ custom error key
-      "Invalid username or password";            // ✅ fallback
-    setError(message);                           // ✅ shows on screen
+      err?.response?.data?.detail ||
+      err?.response?.data?.error ||
+      err?.response?.data?.message ||
+      "Invalid username or password";
+    setError(message);
   }
 };
 

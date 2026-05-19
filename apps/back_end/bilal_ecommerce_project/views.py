@@ -10,17 +10,112 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 import cloudinary.uploader
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
 # ─────────────────────────────────────────
 # HOME
 # ─────────────────────────────────────────
 def home_view(request):
-    return HttpResponse("Django API Running 🚀")
+    return HttpResponse("Django project Running 🚀")
 
 
 def spa(request):
-    return HttpResponse("Django API Running 🚀")
+    return HttpResponse("Django spa Running 🚀")
+
+
+# ─────────────────────────────────────────
+# TOKEN WITH COOKIES
+# ─────────────────────────────────────────
+class TokenObtainPairCookieView(APIView):
+    def post(self, request):
+        try:
+            serializer = TokenObtainPairSerializer(data=request.data)
+            if serializer.is_valid():
+                tokens = serializer.validated_data
+                response = Response({
+                    "message": "Login successful",
+                    "username": request.data.get("username"),
+                    "access": str(tokens.get("access")),
+                    "refresh": str(tokens.get("refresh"))
+                }, status=status.HTTP_200_OK)
+
+                # Set tokens as cookies
+                response.set_cookie(
+                    key="access_token",
+                    value=str(tokens.get("access")),
+                    max_age=7 * 24 * 60 * 60,
+                    secure=False,
+                    httponly=False,
+                    samesite="Lax"
+                )
+
+                response.set_cookie(
+                    key="refresh_token",
+                    value=str(tokens.get("refresh")),
+                    max_age=30 * 24 * 60 * 60,
+                    secure=False,
+                    httponly=False,
+                    samesite="Lax"
+                )
+
+                return response
+
+            # Debug: log validation errors
+            print(f"Serializer errors: {serializer.errors}")
+            return Response(
+                {"error": "Invalid credentials", "details": serializer.errors},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        except Exception as e:
+            print(f"Login error: {str(e)}")
+            return Response(
+                {"error": f"Login failed: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class TokenRefreshCookieView(APIView):
+    def post(self, request):
+        from rest_framework_simplejwt.serializers import TokenRefreshSerializer
+        from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
+
+        refresh_token = request.COOKIES.get("refresh_token") or request.data.get("refresh")
+
+        if not refresh_token:
+            return Response(
+                {"error": "Refresh token not provided"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            serializer = TokenRefreshSerializer(data={"refresh": refresh_token})
+            if serializer.is_valid():
+                tokens = serializer.validated_data
+                response = Response(
+                    {"message": "Token refreshed", "access": str(tokens.get("access"))},
+                    status=status.HTTP_200_OK
+                )
+
+                response.set_cookie(
+                    key="access_token",
+                    value=str(tokens.get("access")),
+                    max_age=7 * 24 * 60 * 60,
+                    secure=False,
+                    httponly=False,
+                    samesite="Lax"
+                )
+
+                return response
+            return Response(
+                {"error": serializer.errors},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        except (TokenError, InvalidToken) as e:
+            return Response(
+                {"error": f"Token error: {str(e)}"},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
 
 
 # ─────────────────────────────────────────

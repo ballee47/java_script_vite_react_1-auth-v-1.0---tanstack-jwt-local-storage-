@@ -1,7 +1,7 @@
 // src/guards/ProtectedRoute.tsx
 import { Navigate, Outlet } from "react-router-dom";
 import { useMe } from "@/features/auth/hooks/useAuthQueries";
-import { tokenStorage } from "@/infra/storage/localStorage";
+import { tokenStorage } from "@/infra/storage/cookieStorage";
 
 export default function ProtectedRoute() {
 

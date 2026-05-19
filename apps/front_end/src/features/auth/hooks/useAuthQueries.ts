@@ -1,6 +1,6 @@
 // src/features/auth/hooks/useAuthQueries.ts
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { tokenStorage, clearAllStorage } from "@/infra/storage/localStorage";
+import { tokenStorage, clearAllStorage } from "@/infra/storage/cookieStorage";
 import { loginApi, fetchMeApi } from "../api/login.api";
 import { queryKeys } from "@/query/keys";
 

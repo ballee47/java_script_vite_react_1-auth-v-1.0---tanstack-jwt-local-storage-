@@ -1,6 +1,6 @@
 // src/guards/GuestRoute.tsx
 import { Navigate, Outlet } from "react-router-dom";
-import { tokenStorage } from "@/infra/storage/localStorage";
+import { tokenStorage } from "@/infra/storage/cookieStorage";
 
 export default function GuestRoute() {
 

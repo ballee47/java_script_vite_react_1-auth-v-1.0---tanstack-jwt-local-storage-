@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useMe } from "../hooks/useAuthQueries";
-import { tokenStorage } from "@/infra/storage/localStorage";
+import { tokenStorage } from "@/infra/storage/cookieStorage";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { isLoading, data: user } = useMe();

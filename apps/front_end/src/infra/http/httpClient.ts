@@ -1,10 +1,11 @@
 // src/infra/http/httpClient.ts
 import axios from "axios";
-import { tokenStorage, clearAllStorage } from "@/infra/storage/localStorage";
-import { env } from "@/config/env"; // ✅ import env
+import { tokenStorage, clearAllStorage } from "@/infra/storage/cookieStorage";
+import { env } from "@/config/env";
 
 export const httpClient = axios.create({
-  baseURL: env.API_BASE_URL, // ✅ was hardcoded
+  baseURL: env.API_BASE_URL,
+  withCredentials: true,
 });
 
 // REQUEST INTERCEPTOR
@@ -28,19 +29,34 @@ httpClient.interceptors.response.use(
 
       try {
         const refreshToken = tokenStorage.getRefreshToken();
-        if (!refreshToken) throw new Error("No refresh token");
+        if (!refreshToken) {
+          clearAllStorage();
+          window.location.href = "/login";
+          return Promise.reject(error);
+        }
 
-        // ✅ was hardcoded URL
-        const { data } = await axios.post(
-          `${env.API_BASE_URL}/api/token/refresh/`,
+        const refreshClient = axios.create({
+          baseURL: env.API_BASE_URL,
+          withCredentials: true,
+        });
+
+        const { data } = await refreshClient.post(
+          "/api/token/refresh/",
           { refresh: refreshToken }
         );
 
-        tokenStorage.setAccessToken(data.access);
-        originalRequest.headers.Authorization = `Bearer ${data.access}`;
-        return httpClient(originalRequest);
+        if (data.access) {
+          tokenStorage.setAccessToken(data.access);
+          originalRequest.headers.Authorization = `Bearer ${data.access}`;
+          return httpClient(originalRequest);
+        } else {
+          clearAllStorage();
+          window.location.href = "/login";
+          return Promise.reject(error);
+        }
 
       } catch (refreshError) {
+        console.error("Token refresh failed:", refreshError);
         clearAllStorage();
         window.location.href = "/login";
         return Promise.reject(refreshError);
