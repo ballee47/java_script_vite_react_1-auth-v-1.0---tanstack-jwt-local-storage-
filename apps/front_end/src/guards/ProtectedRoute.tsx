@@ -1,22 +1,10 @@
-// src/guards/ProtectedRoute.tsx
 import { Navigate, Outlet } from "react-router-dom";
 import { useMe } from "@/features/auth/hooks/useAuthQueries";
-import { tokenStorage } from "@/infra/storage/cookieStorage";
 
 export default function ProtectedRoute() {
+  const { isLoading, isError, data } = useMe();
 
-  const { isLoading, isError } = useMe();
-
-  // ─────────────────────────────────────────
-  // 1. no token at all — redirect immediately
-  // ─────────────────────────────────────────
-  if (!tokenStorage.hasAccessToken()) {
-    return <Navigate to="/login" replace />;
-  }
-
-  // ─────────────────────────────────────────
-  // 2. token exists but still fetching user
-  // ─────────────────────────────────────────
+  // loading state
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-900">
@@ -25,16 +13,11 @@ export default function ProtectedRoute() {
     );
   }
 
-  // ─────────────────────────────────────────
-  // 3. token exists but user fetch failed
-  //    (token is invalid/expired & refresh failed)
-  // ─────────────────────────────────────────
-  if (isError) {
+  // not authenticated
+  if (isError || !data) {
     return <Navigate to="/login" replace />;
   }
 
-  // ─────────────────────────────────────────
-  // 4. authenticated — render the page
-  // ─────────────────────────────────────────
+  // authenticated
   return <Outlet />;
 }

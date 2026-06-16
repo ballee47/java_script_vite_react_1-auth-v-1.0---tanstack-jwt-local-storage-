@@ -6,7 +6,16 @@ export const httpClient = axios.create({
   withCredentials: true,
   timeout: 30000,
   headers: {
-    "Content-Type": "application/json",
     Accept: "application/json",
+    "Content-Type": "application/json",
   },
 });
+
+if (import.meta.env.DEV) {
+  httpClient.interceptors.request.use((config) => {
+    console.log(
+      `[API] ${config.method?.toUpperCase()} ${config.url}`
+    );
+    return config;
+  });
+}

@@ -12,43 +12,39 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
+  e.preventDefault();
+  setError(null);
 
-    try {
-      console.log("Login attempt:", { username });
+  try {
+    console.log("Login attempt:", { username });
 
-      // 1️⃣ LOGIN (backend sets HTTP-only cookies)
-      await loginMutate({ username, password });
+    // 1. login (sets cookies)
+    await loginMutate({ username, password });
 
-      console.log("Login success, verifying session...");
+    // 2. verify session BEFORE navigation
+    const meRes = await fetch("http://localhost:8000/api/me/", {
+      credentials: "include",
+    });
 
-      // 2️⃣ VERIFY SESSION
-      const me = await fetch("http://localhost:8000/api/me/", {
-        credentials: "include",
-      });
-
-      if (!me.ok) {
-        throw new Error("Session not valid");
-      }
-
-      const user = await me.json();
-      console.log("Authenticated user:", user);
-
-      // 3️⃣ GO TO DASHBOARD
-      navigate("/dashboard", { replace: true });
-
-    } catch (err: any) {
-      console.error("Login error:", err);
-
-      const message =
-        err?.response?.data?.detail ||
-        err?.response?.data?.error ||
-        "Login failed. Please try again.";
-
-      setError(message);
+    if (!meRes.ok) {
+      throw new Error("Session not created");
     }
-  };
+
+    const me = await meRes.json();
+    console.log("Authenticated user:", me);
+
+    // 3. NOW navigate safely
+    console.log("ABOUT TO NAVIGATE");
+
+    navigate("/dashboard", { replace: true });
+
+    console.log("NAVIGATED");
+
+  } catch (err: any) {
+    console.error("Login error:", err);
+    setError("Login failed or session invalid");
+  }
+};
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-slate-950 overflow-hidden">
