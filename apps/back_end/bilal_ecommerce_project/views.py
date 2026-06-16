@@ -1,141 +1,146 @@
 # apps/back_end/bilal_ecommerce_project/views.py
 
-from django.shortcuts import render, HttpResponse
-from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.decorators import api_view
-from rest_framework.parsers import MultiPartParser, FormParser
-from django.contrib.auth.models import User
+from django.http import HttpResponse
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view
+from rest_framework import status
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import TokenError
 import cloudinary.uploader
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
-# ─────────────────────────────────────────
+# ─────────────────────────────────────
 # HOME
-# ─────────────────────────────────────────
+# ─────────────────────────────────────
 def home_view(request):
     return HttpResponse("Django project Running 🚀")
 
 
 def spa(request):
-    return HttpResponse("Django spa Running 🚀")
+    return HttpResponse("Django SPA Running 🚀")
 
 
-# ─────────────────────────────────────────
-# TOKEN WITH COOKIES
-# ─────────────────────────────────────────
+# ─────────────────────────────────────
+# LOGIN (COOKIE JWT)
+# ─────────────────────────────────────
 class TokenObtainPairCookieView(APIView):
+
     def post(self, request):
-        try:
-            serializer = TokenObtainPairSerializer(data=request.data)
-            if serializer.is_valid():
-                tokens = serializer.validated_data
-                response = Response({
-                    "message": "Login successful",
-                    "username": request.data.get("username"),
-                    "access": str(tokens.get("access")),
-                    "refresh": str(tokens.get("refresh"))
-                }, status=status.HTTP_200_OK)
+        username = request.data.get("username")
+        password = request.data.get("password")
 
-                # Set tokens as cookies
-                response.set_cookie(
-                    key="access_token",
-                    value=str(tokens.get("access")),
-                    max_age=7 * 24 * 60 * 60,
-                    secure=False,
-                    httponly=False,
-                    samesite="Lax"
-                )
+        user = authenticate(username=username, password=password)
 
-                response.set_cookie(
-                    key="refresh_token",
-                    value=str(tokens.get("refresh")),
-                    max_age=30 * 24 * 60 * 60,
-                    secure=False,
-                    httponly=False,
-                    samesite="Lax"
-                )
-
-                return response
-
-            # Debug: log validation errors
-            print(f"Serializer errors: {serializer.errors}")
+        if not user:
             return Response(
-                {"error": "Invalid credentials", "details": serializer.errors},
+                {"detail": "Invalid credentials"},
                 status=status.HTTP_401_UNAUTHORIZED
             )
-        except Exception as e:
-            print(f"Login error: {str(e)}")
-            return Response(
-                {"error": f"Login failed: {str(e)}"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+
+        refresh = RefreshToken.for_user(user)
+        access = str(refresh.access_token)
+        refresh = str(refresh)
+
+        response = Response(
+            {"message": "Login successful"},
+            status=status.HTTP_200_OK
+        )
+
+        # ACCESS TOKEN COOKIE
+        response.set_cookie(
+            key="access_token",
+            value=access,
+            httponly=True,
+            secure=False,   # change True in production (HTTPS)
+            samesite="Lax",
+            max_age=15 * 60,
+        )
+
+        # REFRESH TOKEN COOKIE
+        response.set_cookie(
+            key="refresh_token",
+            value=refresh,
+            httponly=True,
+            secure=False,
+            samesite="Lax",
+            max_age=7 * 24 * 60 * 60,
+        )
+
+        return response
 
 
+# ─────────────────────────────────────
+# REFRESH TOKEN (COOKIE BASED)
+# ─────────────────────────────────────
 class TokenRefreshCookieView(APIView):
-    def post(self, request):
-        from rest_framework_simplejwt.serializers import TokenRefreshSerializer
-        from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 
-        refresh_token = request.COOKIES.get("refresh_token") or request.data.get("refresh")
+    def post(self, request):
+
+        refresh_token = request.COOKIES.get("refresh_token")
 
         if not refresh_token:
             return Response(
-                {"error": "Refresh token not provided"},
-                status=status.HTTP_400_BAD_REQUEST
+                {"detail": "No refresh token found"},
+                status=status.HTTP_401_UNAUTHORIZED
             )
 
         try:
-            serializer = TokenRefreshSerializer(data={"refresh": refresh_token})
-            if serializer.is_valid():
-                tokens = serializer.validated_data
-                response = Response(
-                    {"message": "Token refreshed", "access": str(tokens.get("access"))},
-                    status=status.HTTP_200_OK
-                )
+            refresh = RefreshToken(refresh_token)
+            access = str(refresh.access_token)
 
-                response.set_cookie(
-                    key="access_token",
-                    value=str(tokens.get("access")),
-                    max_age=7 * 24 * 60 * 60,
-                    secure=False,
-                    httponly=False,
-                    samesite="Lax"
-                )
-
-                return response
-            return Response(
-                {"error": serializer.errors},
-                status=status.HTTP_401_UNAUTHORIZED
+            response = Response(
+                {"message": "Token refreshed"},
+                status=status.HTTP_200_OK
             )
-        except (TokenError, InvalidToken) as e:
+
+            response.set_cookie(
+                key="access_token",
+                value=access,
+                httponly=True,
+                secure=False,
+                samesite="Lax",
+                max_age=15 * 60,
+            )
+
+            return response
+
+        except TokenError:
             return Response(
-                {"error": f"Token error: {str(e)}"},
+                {"detail": "Invalid refresh token"},
                 status=status.HTTP_401_UNAUTHORIZED
             )
 
 
-# ─────────────────────────────────────────
-# ME — logged in user info
-# ─────────────────────────────────────────
+# ─────────────────────────────────────
+# ME (CURRENT USER) ✅ FIXED + ADDED
+# ─────────────────────────────────────
 class MeAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+
+        user = request.user
+
+        if not user or not user.is_authenticated:
+            return Response(
+                {"detail": "Not authenticated"},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
         return Response({
-            "id": request.user.id,           # ✅ added
-            "username": request.user.username,
-            "email": request.user.email,      # ✅ added
-            "is_superuser": request.user.is_superuser,
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
         })
 
 
-# ─────────────────────────────────────────
-# REGISTER
-# ─────────────────────────────────────────
+# ─────────────────────────────────────
+# REGISTER USER
+# ─────────────────────────────────────
 @api_view(['POST'])
 def register_user(request):
     data = request.data
@@ -144,23 +149,21 @@ def register_user(request):
     password = data.get("password")
     email = data.get("email")
 
-    # ✅ validate required fields
     if not username or not password:
         return Response(
-            {"message": "Username and password are required"},
+            {"detail": "Username and password required"},
             status=status.HTTP_400_BAD_REQUEST
         )
 
     if User.objects.filter(username=username).exists():
         return Response(
-            {"message": "Username already exists"},
+            {"detail": "Username already exists"},
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    # ✅ check email uniqueness too
     if email and User.objects.filter(email=email).exists():
         return Response(
-            {"message": "Email already exists"},
+            {"detail": "Email already exists"},
             status=status.HTTP_400_BAD_REQUEST
         )
 
@@ -170,36 +173,39 @@ def register_user(request):
         email=email or ""
     )
 
-    return Response({
-        "message": "User created successfully",
-        "username": user.username,
-    }, status=status.HTTP_201_CREATED)
+    return Response(
+        {
+            "message": "User created successfully",
+            "username": user.username
+        },
+        status=status.HTTP_201_CREATED
+    )
 
 
-# ─────────────────────────────────────────
-# IMAGE UPLOAD — Cloudinary
-# ─────────────────────────────────────────
+# ─────────────────────────────────────
+# IMAGE UPLOAD (CLOUDINARY)
+# ─────────────────────────────────────
 class ImageUploadView(APIView):
     permission_classes = [IsAuthenticated]
-    parser_classes = (MultiPartParser, FormParser)
 
     def post(self, request):
-        image = request.FILES.get('image')
+        image = request.FILES.get("image")
 
         if not image:
             return Response(
-                {"error": "No image provided"},
+                {"detail": "No image provided"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         try:
-            upload_result = cloudinary.uploader.upload(image)
+            result = cloudinary.uploader.upload(image)
+
             return Response({
-                "image_url": upload_result.get("secure_url")
-            }, status=status.HTTP_200_OK)
+                "image_url": result.get("secure_url")
+            })
 
         except Exception as e:
             return Response(
-                {"error": str(e)},
+                {"detail": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )

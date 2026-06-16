@@ -1,5 +1,10 @@
 // src/features/auth/api/login.api.ts
+import { AxiosResponse } from "axios";
 import { httpClient } from "@/infra/http/httpClient";
+import { tokenStorage } from "@/infra/storage/localStorage";
+import { setupInterceptors } from "@/infra/http/setupInterceptors";
+
+setupInterceptors(); // <-- IMPORTANT (run once at app bootstrap ideally)
 
 // ─────────────────────────────────────────
 // LOGIN
@@ -14,8 +19,14 @@ export type LoginResponse = {
   refresh: string;
 };
 
-export const loginApi = async (payload: LoginPayload): Promise<LoginResponse> => {
-  const res = await httpClient.post("/api/token/", payload);
+export const loginApi = async (
+  payload: LoginPayload
+): Promise<LoginResponse> => {
+  const res: AxiosResponse<LoginResponse> =
+    await httpClient.post<LoginResponse>("/api/token/", payload);
+
+  tokenStorage.setTokens(res.data.access, res.data.refresh);
+
   return res.data;
 };
 
@@ -29,7 +40,9 @@ export type MeResponse = {
 };
 
 export const fetchMeApi = async (): Promise<MeResponse> => {
-  const res = await httpClient.get("/api/me/");
+  const res: AxiosResponse<MeResponse> =
+    await httpClient.get<MeResponse>("/api/me/");
+
   return res.data;
 };
 
@@ -42,6 +55,8 @@ export type SignupPayload = {
   password: string;
 };
 
-export const signupApi = async (payload: SignupPayload): Promise<void> => {
+export const signupApi = async (
+  payload: SignupPayload
+): Promise<void> => {
   await httpClient.post("/api/register/", payload);
 };
