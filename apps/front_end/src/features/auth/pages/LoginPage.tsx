@@ -5,38 +5,55 @@ import { useLogin } from "@/features/auth/hooks/useAuthQueries";
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { mutateAsync: loginMutate, isPending } = useLogin(); // ✅ mutateAsync
+  const { mutateAsync: loginMutate, isPending } = useLogin();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  
-const handleLogin = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setError(null);
 
-  try {
-    console.log("Attempting login with:", { username, password });
-    const response = await loginMutate({ username, password });
-    console.log("Login response:", response);
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    navigate("/dashboard", { replace: true });
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
 
-  } catch (err: any) {
-    console.error("Login error:", err);
-    const message =
-      err?.response?.data?.detail ||
-      err?.response?.data?.error ||
-      err?.response?.data?.message ||
-      "Invalid username or password";
-    setError(message);
-  }
-};
+    try {
+      console.log("Login attempt:", { username });
+
+      // 1️⃣ LOGIN (backend sets HTTP-only cookies)
+      await loginMutate({ username, password });
+
+      console.log("Login success, verifying session...");
+
+      // 2️⃣ VERIFY SESSION
+      const me = await fetch("http://localhost:8000/api/me/", {
+        credentials: "include",
+      });
+
+      if (!me.ok) {
+        throw new Error("Session not valid");
+      }
+
+      const user = await me.json();
+      console.log("Authenticated user:", user);
+
+      // 3️⃣ GO TO DASHBOARD
+      navigate("/dashboard", { replace: true });
+
+    } catch (err: any) {
+      console.error("Login error:", err);
+
+      const message =
+        err?.response?.data?.detail ||
+        err?.response?.data?.error ||
+        "Login failed. Please try again.";
+
+      setError(message);
+    }
+  };
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-slate-950 overflow-hidden">
 
-      {/* BACKGROUND GLOW */}
+      {/* BACKGROUND */}
       <div className="absolute inset-0">
         <div className="absolute w-[500px] h-[500px] bg-blue-600/30 rounded-full blur-[120px] top-[-120px] left-[-120px]" />
         <div className="absolute w-[500px] h-[500px] bg-purple-600/30 rounded-full blur-[120px] bottom-[-120px] right-[-120px]" />
@@ -51,6 +68,7 @@ const handleLogin = async (e: React.FormEvent) => {
         >
           🏠 Home
         </button>
+
         <button
           onClick={() => navigate(-1)}
           className="px-4 py-2 rounded-lg bg-red-500/80 text-white hover:bg-red-600 transition"
@@ -84,7 +102,7 @@ const handleLogin = async (e: React.FormEvent) => {
               placeholder="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/50 outline-none focus:ring-2 focus:ring-blue-500 transition"
+              className="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/50 outline-none focus:ring-2 focus:ring-blue-500"
             />
 
             <input
@@ -92,13 +110,13 @@ const handleLogin = async (e: React.FormEvent) => {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/50 outline-none focus:ring-2 focus:ring-blue-500 transition"
+              className="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/50 outline-none focus:ring-2 focus:ring-blue-500"
             />
 
             <button
               type="submit"
               disabled={isPending}
-              className="w-full py-3 rounded-lg bg-blue-600 hover:bg-blue-700 active:scale-[0.98] transition font-semibold text-white disabled:opacity-50"
+              className="w-full py-3 rounded-lg bg-blue-600 hover:bg-blue-700 font-semibold text-white disabled:opacity-50"
             >
               {isPending ? "Signing in..." : "Sign In"}
             </button>
@@ -110,6 +128,7 @@ const handleLogin = async (e: React.FormEvent) => {
             <span className="hover:text-white cursor-pointer">
               Forgot password?
             </span>
+
             <span
               onClick={() => navigate("/signup")}
               className="hover:text-white cursor-pointer"

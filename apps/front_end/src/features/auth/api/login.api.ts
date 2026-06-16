@@ -19,13 +19,14 @@ export type LoginResponse = {
   refresh: string;
 };
 
-export const loginApi = async (
-  payload: LoginPayload
-): Promise<LoginResponse> => {
-  const res: AxiosResponse<LoginResponse> =
-    await httpClient.post<LoginResponse>("/api/token/", payload);
-
-  tokenStorage.setTokens(res.data.access, res.data.refresh);
+export const loginApi = async (payload: LoginPayload) => {
+  const res = await httpClient.post(
+    "/api/token/",
+    payload,
+    {
+      withCredentials: true, // 🔥 VERY IMPORTANT for cookies
+    }
+  );
 
   return res.data;
 };
