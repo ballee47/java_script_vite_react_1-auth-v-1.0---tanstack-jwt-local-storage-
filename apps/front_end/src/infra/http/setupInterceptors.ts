@@ -1,43 +1,69 @@
-// src/infra/http/setupInterceptors.ts
-
-import { AxiosError } from "axios";
+import { AxiosError, InternalAxiosRequestConfig } from "axios";
 import { httpClient } from "./httpClient";
 import { logger } from "./logger";
-import { RetryableRequestConfig } from "./types";
 
-let interceptorInitialized = false;
-
+let isInterceptorInitialized = false;
 let isRefreshing = false;
 
-let failedQueue: Array<{
-  resolve: () => void;
+type QueueItem = {
+  resolve: (token?: string) => void;
   reject: (error: unknown) => void;
-}> = [];
+};
 
-const processQueue = (error?: unknown) => {
-  failedQueue.forEach((promise) => {
+let failedQueue: QueueItem[] = [];
+
+/**
+ * Process queued requests after refresh completes
+ */
+const processQueue = (error: unknown | null, token?: string) => {
+  failedQueue.forEach((item) => {
     if (error) {
-      promise.reject(error);
+      item.reject(error);
     } else {
-      promise.resolve();
+      item.resolve(token);
     }
   });
 
   failedQueue = [];
 };
 
-export const setupInterceptors = (): void => {
-  // Prevent duplicate interceptor registration
-  if (interceptorInitialized) return;
+/**
+ * Attach token safely to request
+ */
+const attachToken = (
+  config: InternalAxiosRequestConfig,
+  token: string
+) => {
+  config.headers = config.headers ?? {};
+  config.headers.Authorization = `Bearer ${token}`;
+  return config;
+};
 
-  interceptorInitialized = true;
+/**
+ * Refresh token function (isolated for testability)
+ */
+const refreshAccessToken = async (): Promise<string> => {
+  const res = await httpClient.post("/api/token/refresh/");
+  return res.data.access_token;
+};
+
+export const setupInterceptors = () => {
+  if (isInterceptorInitialized) return;
+  isInterceptorInitialized = true;
+
+  httpClient.interceptors.request.use((config) => {
+    // Optional: attach token from storage on every request
+    // const token = tokenStorage.getAccessToken();
+    // if (token) attachToken(config, token);
+
+    return config;
+  });
 
   httpClient.interceptors.response.use(
     (response) => response,
 
     async (error: AxiosError) => {
-      const originalRequest =
-        error.config as RetryableRequestConfig;
+      const originalRequest = error.config as any;
 
       if (!originalRequest) {
         return Promise.reject(error);
@@ -45,41 +71,37 @@ export const setupInterceptors = (): void => {
 
       const url = originalRequest.url ?? "";
 
-      // --------------------------------------------------
-      // Never intercept authentication endpoints
-      // --------------------------------------------------
-      const isAuthEndpoint =
+      const isAuthRoute =
         url.includes("/api/token/") ||
-        url.includes("/api/token/refresh/") ||
         url.includes("/api/register/");
 
-      if (isAuthEndpoint) {
+      // ❌ Don't intercept auth endpoints
+      if (isAuthRoute) {
         return Promise.reject(error);
       }
 
-      // --------------------------------------------------
-      // Only handle 401 errors
-      // --------------------------------------------------
+      // ❌ Only handle 401
       if (error.response?.status !== 401) {
         return Promise.reject(error);
       }
 
-      // --------------------------------------------------
-      // Prevent infinite retry loop
-      // --------------------------------------------------
+      // ❌ Prevent retry loops
       if (originalRequest._retry) {
         return Promise.reject(error);
       }
 
       originalRequest._retry = true;
 
-      // --------------------------------------------------
-      // Refresh already in progress
-      // --------------------------------------------------
+      /**
+       * If refresh is already running → queue request
+       */
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({
-            resolve: () => {
+            resolve: (token?: string) => {
+              if (token) {
+                originalRequest.headers.Authorization = `Bearer ${token}`;
+              }
               resolve(httpClient(originalRequest));
             },
             reject,
@@ -92,24 +114,25 @@ export const setupInterceptors = (): void => {
       try {
         logger.info("Refreshing access token...");
 
-        await httpClient.post("/api/token/refresh/");
+        const newAccessToken = await refreshAccessToken();
 
-        logger.info("Token refresh successful");
+        logger.info("Token refreshed successfully");
 
-        processQueue();
+        // Update queued requests
+        processQueue(null, newAccessToken);
+
+        // Retry original request with new token
+        originalRequest.headers.Authorization =
+          `Bearer ${newAccessToken}`;
 
         return httpClient(originalRequest);
       } catch (refreshError) {
-        logger.error(
-          "Token refresh failed",
-          refreshError
-        );
+        logger.error("Refresh token failed", refreshError);
 
-        processQueue(refreshError);
+        processQueue(refreshError, undefined);
 
-        // Force logout
-        window.location.replace("/login");
-
+        // ❌ DO NOT hard redirect in enterprise apps
+        // Instead let auth layer handle it
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
