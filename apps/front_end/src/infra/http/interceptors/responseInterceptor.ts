@@ -5,7 +5,6 @@ import { logger } from "../logger/logger";
 import { logout } from "../auth/logout";
 
 let isRefreshing = false;
-let isLoggingOut = false;
 
 export function responseInterceptor(error: any) {
   const originalRequest = error.config;
@@ -57,9 +56,6 @@ export function responseInterceptor(error: any) {
     })
     .catch((err) => {
       rejectQueue(err);
-      if (isLoggingOut) return Promise.reject(err);
-
-      isLoggingOut = true;
       logger.error("Session expired", err);
       logout();
       return Promise.reject(err);

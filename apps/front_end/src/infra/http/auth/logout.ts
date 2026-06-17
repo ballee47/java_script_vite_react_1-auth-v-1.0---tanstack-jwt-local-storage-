@@ -1,17 +1,21 @@
 import { axiosInstance } from "@/infra/http/client/axiosInstance";
 
-let isLoggingOut = false;
+let logoutPromise: Promise<void> | null = null;
 
-export const logout = async () => {
-  if (isLoggingOut) return;
-  isLoggingOut = true;
+export const logout = async (): Promise<void> => {
+  if (logoutPromise) return logoutPromise;
 
-  try {
-    await axiosInstance.post("api/logout/");
-  } catch (err) {
-    // ignore backend errors
-  }
+  logoutPromise = (async () => {
+    try {
+      await axiosInstance.post("api/logout/");
+    } catch (err) {
+      // ignore backend errors
+    } finally {
+      localStorage.clear();
+    }
+  })().finally(() => {
+    logoutPromise = null;
+  });
 
-  // Clear frontend state only (don't redirect here)
-  localStorage.clear();
+  return logoutPromise;
 };
