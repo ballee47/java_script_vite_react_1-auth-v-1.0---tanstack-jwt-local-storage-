@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/features/auth/hooks/useAuth"; // ✅ single import
 import { CartIcon } from "@/features/cart";
 import { queryClient } from "@/query/client";
+import { clearAllStorage } from "@/infra/storage/cookieStorage";
 
 type NavbarProps = {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -41,12 +42,18 @@ export default function Navbar({ setOpen }: NavbarProps) {
 
   // ✅ clean logout handler
 const handleLogout = () => {
+  // 🔥 Immediately clear storage so AuthProvider detects logout
+  clearAllStorage();
+  queryClient.clear();
+
   logout(undefined, {
     onSuccess: () => {
       setOpenUserMenu(false);
-      queryClient.clear();
       navigate("/login", { replace: true });
     },
+    onError: () => {
+      navigate("/login", { replace: true });
+    }
   });
 };
 

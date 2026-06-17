@@ -34,9 +34,9 @@ export const useMe = () => {
 
     retry: false, // 🔥 correct for auth endpoints
 
-    staleTime: 1000 * 60 * 5, // cache user for 5 min (prevents spam calls)
+    staleTime: 0, // 🔥 NO caching after logout
 
-    gcTime: 1000 * 60 * 10, // keep cache for a bit
+    gcTime: 0, // 🔥 NO memory cache
 
     refetchOnWindowFocus: false,
 
