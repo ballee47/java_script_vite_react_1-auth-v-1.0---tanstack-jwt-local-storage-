@@ -2,30 +2,20 @@
 
 import os
 from pathlib import Path
-from dotenv import load_dotenv
-from datetime import timedelta
 import cloudinary
+from dotenv import load_dotenv
 
+# ✅ load_dotenv() FIRST — before any os.getenv()
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-
-# ─────────────────────────────────────
-# CORE
-# ─────────────────────────────────────
+# ✅ now these will work correctly
 SECRET_KEY = os.getenv("SECRET_KEY")
-DEBUG = os.getenv("DEBUG", "True") == "True"
+DEBUG = True
+ALLOWED_HOSTS = []
 
-ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
-]
-
-
-# ─────────────────────────────────────
-# APPS
-# ─────────────────────────────────────
+# Apps
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -33,10 +23,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     'rest_framework',
+    # ❌ removed — 'rest_framework.authtoken' not needed with JWT
     'corsheaders',
-
     'accounts',
     'products',
     'orders',
@@ -47,14 +36,10 @@ INSTALLED_APPS = [
     'Store',
 ]
 
-
-# ─────────────────────────────────────
-# MIDDLEWARE
-# ─────────────────────────────────────
+# Middleware
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
-
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # ✅ stays at top
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -63,31 +48,17 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-
-# ─────────────────────────────────────
-# CORS (FIXED FOR CHROME + COOKIE AUTH)
-# ─────────────────────────────────────
-CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
-    os.getenv("FRONTEND_URL", "http://localhost:5173"),
+    "http://localhost:5173",
+    "http://localhost:3000",
 ]
 
-CSRF_TRUSTED_ORIGINS = [
-    os.getenv("FRONTEND_URL", "http://localhost:5173"),
-]
-
-
-# ─────────────────────────────────────
-# URLS
-# ─────────────────────────────────────
 ROOT_URLCONF = 'bilal_ecommerce_project.urls'
 
-
-# ─────────────────────────────────────
-# TEMPLATES
-# ─────────────────────────────────────
+# Templates
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -103,13 +74,9 @@ TEMPLATES = [
     },
 ]
 
-
 WSGI_APPLICATION = 'bilal_ecommerce_project.wsgi.application'
 
-
-# ─────────────────────────────────────
-# DATABASE
-# ─────────────────────────────────────
+# Database
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -117,10 +84,7 @@ DATABASES = {
     }
 }
 
-
-# ─────────────────────────────────────
-# AUTH
-# ─────────────────────────────────────
+# Auth
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -128,56 +92,44 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-
-# ─────────────────────────────────────
-# INTERNATIONALIZATION
-# ─────────────────────────────────────
+# International
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-
-# ─────────────────────────────────────
-# STATIC / MEDIA
-# ─────────────────────────────────────
+# Static
 STATIC_URL = '/static/'
 STATICFILES_DIRS = []
 
+# Media
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-# ─────────────────────────────────────
-# DRF (COOKIE JWT AUTH)
-# ─────────────────────────────────────
+# ✅ DRF — JWT only
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'bilal_ecommerce_project.authentication.CookieJWTAuthentication',
+        "bilal_ecommerce_project.authentication.CookieJWTAuthentication",
     )
 }
 
-
-# ─────────────────────────────────────
-# SIMPLE JWT
-# ─────────────────────────────────────
+# ✅ JWT — Token settings
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-    'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': False,
+    'ACCESS_TOKEN_LIFETIME': __import__('datetime').timedelta(days=7),
+    'REFRESH_TOKEN_LIFETIME': __import__('datetime').timedelta(days=30),
     'ALGORITHM': 'HS256',
 }
 
-
-# ─────────────────────────────────────
-# CLOUDINARY
-# ─────────────────────────────────────
+# ✅ Cloudinary — from .env
 cloudinary.config(
     cloud_name=os.getenv("CLOUDINARY_NAME"),
     api_key=os.getenv("CLOUDINARY_API_KEY"),
     api_secret=os.getenv("CLOUDINARY_API_SECRET"),
     secure=True
 )
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+]

@@ -1,6 +1,6 @@
 # apps/back_end/bilal_ecommerce_project/views.py
 
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from rest_framework.views import APIView
@@ -11,6 +11,7 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 import cloudinary.uploader
+
 
 
 # ─────────────────────────────────────
@@ -209,3 +210,45 @@ class ImageUploadView(APIView):
                 {"detail": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+        
+# ─────────────────────────────────────
+# CSRF TOKEN VIEW
+# ─────────────────────────────────────
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.http import JsonResponse
+
+
+@ensure_csrf_cookie
+def csrf_token_view(request):
+    return JsonResponse({"message": "CSRF cookie set"})
+
+
+
+# ─────────────────────────────────────
+# LOGOUT VIEW
+# ─────────────────────────────────────
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+
+
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class LogoutView(APIView):
+
+    def post(self, request):
+        response = Response({"message": "Logged out successfully"})
+
+        # 🔥 IMPORTANT FIX: must match cookie settings exactly
+        response.delete_cookie("access_token", path="/")
+        response.delete_cookie("refresh_token", path="/")
+        response.delete_cookie("csrftoken", path="/")
+
+        return response

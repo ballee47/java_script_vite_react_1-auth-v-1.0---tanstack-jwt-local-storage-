@@ -1,10 +1,11 @@
 import { axiosInstance } from "../client/axiosInstance";
 import { runRefresh } from "./refreshManager";
 import { addToQueue, resolveQueue, rejectQueue } from "./retryQueue";
-import { logout } from "../auth/logout";
 import { logger } from "../logger/logger";
+import { logout } from "../auth/logout";
 
 let isRefreshing = false;
+let isLoggingOut = false;
 
 export function responseInterceptor(error: any) {
   const originalRequest = error.config;
@@ -13,16 +14,21 @@ export function responseInterceptor(error: any) {
 
   const url = originalRequest.url ?? "";
 
+  /**
+   * FIX: match REAL backend routes
+   */
   const isAuthRoute =
-    url.includes("/auth/login") ||
-    url.includes("/auth/register") ||
-    url.includes("/auth/refresh") ||
-    url.includes("/auth/logout");
+    url.includes("/api/token") ||        // login + refresh both start here
+    url.includes("/api/register") ||
+    url.includes("/api/logout/");
 
   if (isAuthRoute) {
     return Promise.reject(error);
   }
 
+  /**
+   * Only handle 401
+   */
   if (error.response?.status !== 401) {
     return Promise.reject(error);
   }
@@ -51,6 +57,9 @@ export function responseInterceptor(error: any) {
     })
     .catch((err) => {
       rejectQueue(err);
+      if (isLoggingOut) return Promise.reject(err);
+
+      isLoggingOut = true;
       logger.error("Session expired", err);
       logout();
       return Promise.reject(err);

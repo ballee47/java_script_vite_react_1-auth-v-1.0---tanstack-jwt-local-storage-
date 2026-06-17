@@ -1,20 +1,17 @@
-import axios from "axios";
+import { axiosInstance } from "@/infra/http/client/axiosInstance";
 
-import { httpConfig } from "../client/config";
+let isLoggingOut = false;
 
-export async function logout(): Promise<void> {
+export const logout = async () => {
+  if (isLoggingOut) return;
+  isLoggingOut = true;
+
   try {
-    await axios.post(
-      `${httpConfig.baseURL}/auth/logout`,
-      {},
-      {
-        withCredentials: true,
-      }
-    );
-  } catch {
-    // Ignore logout errors
-    // We still want to force local logout
+    await axiosInstance.post("api/logout/");
+  } catch (err) {
+    // ignore backend errors
   }
 
-  window.location.href = "/login";
-}
+  // Clear frontend state only (don't redirect here)
+  localStorage.clear();
+};

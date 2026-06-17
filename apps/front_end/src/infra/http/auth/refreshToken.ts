@@ -4,7 +4,7 @@ import { httpConfig } from "../client/config";
 
 export async function refreshToken(): Promise<void> {
   await axios.post(
-    `${httpConfig.baseURL}/auth/refresh`,
+    `${httpConfig.baseURL}/api/token/refresh/`,
     {},
     {
       withCredentials: true,

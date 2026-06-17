@@ -1,14 +1,11 @@
-// src/features/auth/hooks/useAuthQueries.ts
-
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { loginApi, fetchMeApi } from "../api/login.api";
+import { logout as logoutApi } from "@/infra/http/auth/logout";
 import { queryKeys } from "@/query/keys";
 
 /* =====================================================
    LOGIN
-   - Backend sets HTTP-only cookies
-   - No token storage in frontend
-   ===================================================== */
+===================================================== */
 export const useLogin = () => {
   const queryClient = useQueryClient();
 
@@ -16,7 +13,6 @@ export const useLogin = () => {
     mutationFn: loginApi,
 
     onSuccess: async () => {
-      // After login, immediately try to fetch user session
       await queryClient.invalidateQueries({
         queryKey: queryKeys.me,
       });
@@ -29,48 +25,48 @@ export const useLogin = () => {
 };
 
 /* =====================================================
-   CURRENT USER (SESSION CHECK)
-   - Relies fully on cookies
-   - No localStorage dependency
-   ===================================================== */
+   CURRENT USER
+===================================================== */
 export const useMe = () => {
   return useQuery({
     queryKey: queryKeys.me,
     queryFn: fetchMeApi,
 
-    retry: (failureCount, error: any) => {
-      // Don’t spam retry on 401 (invalid session)
-      if (error?.response?.status === 401) return false;
-      return failureCount < 2;
-    },
+    retry: false, // 🔥 correct for auth endpoints
 
-    staleTime: 1000 * 60 * 5, // 5 minutes cache
+    staleTime: 1000 * 60 * 5, // cache user for 5 min (prevents spam calls)
+
+    gcTime: 1000 * 60 * 10, // keep cache for a bit
 
     refetchOnWindowFocus: false,
-    refetchOnReconnect: true,
+
+    refetchOnReconnect: false,
+
+    refetchOnMount: true, // important for fresh auth check
   });
 };
 
 /* =====================================================
-   LOGOUT (FRONTEND ONLY FOR NOW)
-   - Ideally backend should clear cookies
-   ===================================================== */
+   LOGOUT (FIXED - REAL API + CLEAN CACHE RESET)
+===================================================== */
 export const useLogout = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async () => {
-      // OPTIONAL (best practice):
-      // await httpClient.post("/api/logout/");
-      return Promise.resolve();
+      // 🔥 REAL BACKEND CALL (IMPORTANT FIX)
+      await logoutApi();
     },
 
     onSuccess: () => {
-      // Clear all cached user data
-      queryClient.removeQueries({
-        queryKey: queryKeys.me,
-      });
+      // 🔥 HARD RESET ALL AUTH STATE
+      queryClient.removeQueries({ queryKey: queryKeys.me });
+      queryClient.clear();
+    },
 
+    onError: () => {
+      // Even if logout fails, still clear frontend state
+      queryClient.removeQueries({ queryKey: queryKeys.me });
       queryClient.clear();
     },
   });

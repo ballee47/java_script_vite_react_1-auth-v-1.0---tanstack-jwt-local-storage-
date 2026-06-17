@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/features/auth/hooks/useAuth"; // ✅ single import
 import { CartIcon } from "@/features/cart";
+import { queryClient } from "@/query/client";
 
 type NavbarProps = {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -39,14 +40,12 @@ export default function Navbar({ setOpen }: NavbarProps) {
   };
 
   // ✅ clean logout handler
- const handleLogout = () => {
+const handleLogout = () => {
   logout(undefined, {
     onSuccess: () => {
       setOpenUserMenu(false);
-      // ✅ force navigate AFTER state clears
-      setTimeout(() => {
-        navigate("/login", { replace: true });
-      }, 100);
+      queryClient.clear();
+      navigate("/login", { replace: true });
     },
   });
 };

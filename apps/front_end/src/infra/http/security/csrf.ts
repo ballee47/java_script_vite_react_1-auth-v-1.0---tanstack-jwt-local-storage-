@@ -1,12 +1,19 @@
-import Cookies from "js-cookie";
+/**
+ * CSRF Token Reader (Django-compatible, enterprise-safe)
+ * - Works with cookie-based CSRF (csrftoken)
+ * - Safe decoding
+ * - No dependencies
+ */
+export const getCsrfToken = (): string | null => {
+  if (typeof document === "undefined") return null;
 
-const SAFE_METHODS = ["get", "head", "options"];
+  const match = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("csrftoken="));
 
-export function getCsrfToken(): string | undefined {
-  return Cookies.get("csrftoken");
-}
+  if (!match) return null;
 
-export function shouldAttachCsrf(method?: string) {
-  if (!method) return false;
-  return !SAFE_METHODS.includes(method.toLowerCase());
-}
+  const token = match.split("=")[1];
+
+  return token ? decodeURIComponent(token) : null;
+};
