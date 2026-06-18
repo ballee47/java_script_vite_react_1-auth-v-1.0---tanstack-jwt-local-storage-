@@ -56,8 +56,9 @@ class TokenObtainPairCookieView(APIView):
             key="access_token",
             value=access,
             httponly=True,
-            secure=False,   # change True in production (HTTPS)
-            samesite="Lax",
+            secure=True,
+            samesite="None",
+            path="/",
             max_age=15 * 60,
         )
 
@@ -66,8 +67,9 @@ class TokenObtainPairCookieView(APIView):
             key="refresh_token",
             value=refresh,
             httponly=True,
-            secure=False,
-            samesite="Lax",
+            secure=True,
+            samesite="None",
+            path="/",
             max_age=7 * 24 * 60 * 60,
         )
 
@@ -102,8 +104,9 @@ class TokenRefreshCookieView(APIView):
                 key="access_token",
                 value=access,
                 httponly=True,
-                secure=False,
-                samesite="Lax",
+                secure=True,
+                samesite="None",
+                path="/",
                 max_age=15 * 60,
             )
 
