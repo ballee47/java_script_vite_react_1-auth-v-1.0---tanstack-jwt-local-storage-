@@ -10,6 +10,7 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
+from django.conf import settings
 import cloudinary.uploader
 
 
@@ -51,13 +52,17 @@ class TokenObtainPairCookieView(APIView):
             status=status.HTTP_200_OK
         )
 
+        # COOKIE SECURITY (adjust for local dev)
+        secure_cookie = not settings.DEBUG
+        samesite_setting = "None" if not settings.DEBUG else "Lax"
+
         # ACCESS TOKEN COOKIE
         response.set_cookie(
             key="access_token",
             value=access,
             httponly=True,
-            secure=True,
-            samesite="None",
+            secure=secure_cookie,
+            samesite=samesite_setting,
             path="/",
             max_age=15 * 60,
         )
@@ -67,8 +72,8 @@ class TokenObtainPairCookieView(APIView):
             key="refresh_token",
             value=refresh,
             httponly=True,
-            secure=True,
-            samesite="None",
+            secure=secure_cookie,
+            samesite=samesite_setting,
             path="/",
             max_age=7 * 24 * 60 * 60,
         )
@@ -100,12 +105,16 @@ class TokenRefreshCookieView(APIView):
                 status=status.HTTP_200_OK
             )
 
+            # COOKIE SECURITY (adjust for local dev)
+            secure_cookie = not settings.DEBUG
+            samesite_setting = "None" if not settings.DEBUG else "Lax"
+
             response.set_cookie(
                 key="access_token",
                 value=access,
                 httponly=True,
-                secure=True,
-                samesite="None",
+                secure=secure_cookie,
+                samesite=samesite_setting,
                 path="/",
                 max_age=15 * 60,
             )
