@@ -1,10 +1,15 @@
 // src/features/auth/pages/LoginPage.tsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { useLogin } from "@/features/auth/hooks/useAuthQueries";
+
+
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
   const { mutateAsync: loginMutate, isPending } = useLogin();
 
   const [username, setUsername] = useState("");
@@ -12,30 +17,30 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setError(null);
+    e.preventDefault();
+    setError(null);
 
-  try {
-    console.log("Login attempt:", { username });
+    try {
+      console.log("Login attempt:", { username });
 
-    // 1. login (sets cookies)
-    await loginMutate({ username, password });
+      // 1. Login (sets HTTP-only cookie)
+      await loginMutate({ username, password });
 
-    // 2. Wait a bit for query cache to update
-    await new Promise(resolve => setTimeout(resolve, 500));
+      // 2. IMPORTANT: ensure session is loaded BEFORE navigation
+      await queryClient.fetchQuery({
+        queryKey: ["me"],
+      });
 
-    // 3. NOW navigate safely
-    console.log("ABOUT TO NAVIGATE");
+      console.log("AUTH READY");
 
-    navigate("/dashboard", { replace: true });
+      // 3. Safe navigation
+      navigate("/dashboard", { replace: true });
 
-    console.log("NAVIGATED");
-
-  } catch (err: any) {
-    console.error("Login error:", err);
-    setError("Login failed or session invalid");
-  }
-};
+    } catch (err: any) {
+      console.error("Login error:", err);
+      setError("Login failed or session invalid");
+    }
+  };
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-slate-950 overflow-hidden">
@@ -76,12 +81,10 @@ export default function LoginPage() {
             Login to your account
           </p>
 
-          {/* ERROR */}
           {error && (
             <p className="text-red-400 text-center mb-3">{error}</p>
           )}
 
-          {/* FORM */}
           <form onSubmit={handleLogin} className="space-y-4">
 
             <input
@@ -110,7 +113,6 @@ export default function LoginPage() {
 
           </form>
 
-          {/* LINKS */}
           <div className="mt-6 flex justify-between text-sm text-white/60">
             <span className="hover:text-white cursor-pointer">
               Forgot password?

@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { loginApi, fetchMeApi } from "../api/login.api";
 import { logout as logoutApi } from "@/infra/http/auth/logout";
 import { queryKeys } from "@/query/keys";
-import { tokenStorage } from "@/infra/storage/cookieStorage";
 
 /* =====================================================
    LOGIN
@@ -32,10 +31,8 @@ export const useMe = () => {
   return useQuery({
     queryKey: queryKeys.me,
     queryFn: async () => {
-      // 🔥 GUARD: if no token, don't even try to fetch
-      if (!tokenStorage.hasAccessToken()) {
-        throw new Error("No access token");
-      }
+      // Backend sets HttpOnly cookies; don't rely on document.cookie.
+      // Try fetching the current user; server returns 401 if unauthenticated.
       return fetchMeApi();
     },
 

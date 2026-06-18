@@ -1,13 +1,13 @@
-import { getCsrfToken,  } from "../security/csrf";
+import { getCsrfToken } from "../security/csrf";
 
 export function requestInterceptor(config: any) {
   config.withCredentials = true;
 
-  if (getCsrfToken()) {
-    const token = getCsrfToken();
-    if (token) {
-      config.headers["X-CSRFToken"] = token;
-    }
+  config.headers = config.headers || {}; // 🔥 IMPORTANT FIX
+
+  const token = getCsrfToken();
+  if (token) {
+    config.headers["X-CSRFToken"] = token;
   }
 
   return config;
