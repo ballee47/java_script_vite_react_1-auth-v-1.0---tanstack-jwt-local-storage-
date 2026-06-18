@@ -10,8 +10,7 @@ const request = async <T>(
   const response: AxiosResponse<T> =
     await axiosInstance.request<T>(config);
 
-  return response.data;
-};
+  return response.data;};
 
 /**
  * HTTP CLIENT (enterprise-style abstraction)

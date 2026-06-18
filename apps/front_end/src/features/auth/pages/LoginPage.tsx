@@ -21,17 +21,8 @@ export default function LoginPage() {
     // 1. login (sets cookies)
     await loginMutate({ username, password });
 
-    // 2. verify session BEFORE navigation
-    const meRes = await fetch("http://localhost:8000/api/me/", {
-      credentials: "include",
-    });
-
-    if (!meRes.ok) {
-      throw new Error("Session not created");
-    }
-
-    const me = await meRes.json();
-    console.log("Authenticated user:", me);
+    // 2. Wait a bit for query cache to update
+    await new Promise(resolve => setTimeout(resolve, 500));
 
     // 3. NOW navigate safely
     console.log("ABOUT TO NAVIGATE");

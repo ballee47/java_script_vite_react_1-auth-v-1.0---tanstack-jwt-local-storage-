@@ -41,11 +41,15 @@ export default function Navbar({ setOpen }: NavbarProps) {
   };
 
   // ✅ clean logout handler
-const handleLogout = () => {
-  // 🔥 Immediately clear storage so AuthProvider detects logout
+const handleLogout = async () => {
+  // 🔥 Step 1: Clear storage immediately
   clearAllStorage();
   queryClient.clear();
 
+  // 🔥 Step 2: Force refetch to trigger AuthProvider update (will get 401)
+  await queryClient.refetchQueries({ queryKey: ["me"] });
+
+  // 🔥 Step 3: Call logout mutation
   logout(undefined, {
     onSuccess: () => {
       setOpenUserMenu(false);

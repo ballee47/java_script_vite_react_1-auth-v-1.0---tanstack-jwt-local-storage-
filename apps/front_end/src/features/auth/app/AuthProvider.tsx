@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useMe } from "../hooks/useAuthQueries";
 import { tokenStorage } from "@/infra/storage/cookieStorage";
+import { axiosInstance } from "@/infra/http/client/axiosInstance";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { isLoading, data: user } = useMe();
@@ -11,6 +12,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(
     tokenStorage.hasAccessToken()
   );
+
+  // ✅ Initialize CSRF token on app load
+  useEffect(() => {
+    axiosInstance.get("/api/csrf/").catch(() => {
+      // CSRF endpoint might fail, but that's okay - token might be set by other means
+    });
+  }, []);
 
   // ✅ sync with user data from React Query
   useEffect(() => {

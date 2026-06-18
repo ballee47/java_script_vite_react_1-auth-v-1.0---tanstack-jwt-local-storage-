@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { loginApi, fetchMeApi } from "../api/login.api";
 import { logout as logoutApi } from "@/infra/http/auth/logout";
 import { queryKeys } from "@/query/keys";
+import { tokenStorage } from "@/infra/storage/cookieStorage";
 
 /* =====================================================
    LOGIN
@@ -30,19 +31,25 @@ export const useLogin = () => {
 export const useMe = () => {
   return useQuery({
     queryKey: queryKeys.me,
-    queryFn: fetchMeApi,
+    queryFn: async () => {
+      // 🔥 GUARD: if no token, don't even try to fetch
+      if (!tokenStorage.hasAccessToken()) {
+        throw new Error("No access token");
+      }
+      return fetchMeApi();
+    },
 
-    retry: false, // 🔥 correct for auth endpoints
+    retry: false,
 
-    staleTime: 0, // 🔥 NO caching after logout
+    staleTime: 0,
 
-    gcTime: 0, // 🔥 NO memory cache
+    gcTime: 0,
 
     refetchOnWindowFocus: false,
 
     refetchOnReconnect: false,
 
-    refetchOnMount: true, // important for fresh auth check
+    refetchOnMount: true,
   });
 };
 
