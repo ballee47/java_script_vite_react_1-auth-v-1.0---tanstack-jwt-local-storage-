@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { loginApi, fetchMeApi } from "../api/login.api";
 import { logout as logoutApi } from "@/infra/http/auth/logout";
 import { queryKeys } from "@/query/keys";
+import { clearAllStorage } from "@/infra/storage/cookieStorage";
 
 /* =====================================================
    LOGIN
@@ -64,13 +65,18 @@ export const useLogout = () => {
 
     onSuccess: () => {
       // 🔥 HARD RESET ALL AUTH STATE
+      // Clear client-side cookies/storage and cached 'me' data so UI updates.
+      clearAllStorage();
       queryClient.removeQueries({ queryKey: queryKeys.me });
+      queryClient.setQueryData(queryKeys.me, undefined);
       queryClient.clear();
     },
 
     onError: () => {
       // Even if logout fails, still clear frontend state
+      clearAllStorage();
       queryClient.removeQueries({ queryKey: queryKeys.me });
+      queryClient.setQueryData(queryKeys.me, undefined);
       queryClient.clear();
     },
   });
