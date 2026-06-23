@@ -1,9 +1,24 @@
 export const ENDPOINTS = {
   auth: {
-    me: "/auth/me",
-    login: "/auth/login"
+    login: "/token/",
+    refresh: "/token/refresh/",
+    logout: "/logout/",
+    me: "/me/",
   },
-  users: {
-    list: "/users"
-  }
+
+  user: {
+    register: "/register/",
+  },
+
+  csrf: {
+    get: "/csrf/",
+  },
+
+  products: {
+    list: "/products/",
+  },
+
+  categories: {
+    list: "/categories/",
+  },
 };
