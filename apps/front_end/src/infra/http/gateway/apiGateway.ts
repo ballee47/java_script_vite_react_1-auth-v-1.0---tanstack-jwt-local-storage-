@@ -4,6 +4,7 @@ import { tracer } from "../observability/tracer";
 import { metrics } from "../observability/metrics";
 import { withVersion } from "../config/apiVersion";
 
+
 const trace = async <T>(name: string, fn: () => Promise<T>) => {
   const span = tracer.startSpan(name);
   const start = performance.now();
@@ -25,6 +26,7 @@ const trace = async <T>(name: string, fn: () => Promise<T>) => {
 export const apiGateway = {
   get: <T>(url: string) =>
     trace(`GET ${url}`, async () => {
+      console.log("🚀 API GATEWAY GET", url);
       logger.info("GET", { url });
       return httpClient.get<T>(withVersion(url));
     }),
