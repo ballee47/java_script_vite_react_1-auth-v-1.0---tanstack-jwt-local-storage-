@@ -1,4 +1,4 @@
-import { httpClient } from "@/infra/http/client/httpClient";
+import { apiGateway } from "@/infra/http/gateway/apiGateway";
 
 /* LOGIN */
 export type LoginPayload = {
@@ -13,13 +13,11 @@ export type LoginResponse = {
 export const loginApi = async (
   payload: LoginPayload
 ): Promise<LoginResponse> => {
-  const data = await httpClient.post<LoginResponse>(
+  return apiGateway.post<LoginResponse, LoginPayload>(
     "/api/token/",
     payload,
-    { withCredentials: true }
+  
   );
-
-  return data;
 };
 
 /* ME */
@@ -30,12 +28,10 @@ export type MeResponse = {
 };
 
 export const fetchMeApi = async (): Promise<MeResponse> => {
-  const data = await httpClient.get<MeResponse>(
+  return apiGateway.get<MeResponse>(
     "/api/me/",
-    { withCredentials: true }
+   
   );
-
-  return data;
 };
 
 /* SIGNUP */
@@ -48,9 +44,9 @@ export type SignupPayload = {
 export const signupApi = async (
   payload: SignupPayload
 ): Promise<void> => {
-  await httpClient.post(
+  await apiGateway.post<void, SignupPayload>(
     "/api/register/",
     payload,
-    { withCredentials: true }
+  
   );
 };

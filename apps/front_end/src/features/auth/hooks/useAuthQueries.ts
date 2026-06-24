@@ -54,30 +54,28 @@ export const useMe = () => {
 /* =====================================================
    LOGOUT (FIXED - REAL API + CLEAN CACHE RESET)
 ===================================================== */
+
 export const useLogout = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async () => {
-      // 🔥 REAL BACKEND CALL (IMPORTANT FIX)
-      await logoutApi();
-    },
+    mutationFn: logoutApi,
 
-    onSuccess: () => {
-      // 🔥 HARD RESET ALL AUTH STATE
-      // Clear client-side cookies/storage and cached 'me' data so UI updates.
+    onSettled: () => {
       clearAllStorage();
-      queryClient.removeQueries({ queryKey: queryKeys.me });
-      queryClient.setQueryData(queryKeys.me, undefined);
-      queryClient.clear();
-    },
 
-    onError: () => {
-      // Even if logout fails, still clear frontend state
-      clearAllStorage();
-      queryClient.removeQueries({ queryKey: queryKeys.me });
-      queryClient.setQueryData(queryKeys.me, undefined);
-      queryClient.clear();
+      // Force AuthProvider to see "logged out"
+      queryClient.setQueryData(
+        queryKeys.me,
+        null
+      );
+
+      // Optional: remove other cached data
+      queryClient.removeQueries({
+        queryKey: queryKeys.me,
+        exact: true,
+      });
     },
   });
 };
+

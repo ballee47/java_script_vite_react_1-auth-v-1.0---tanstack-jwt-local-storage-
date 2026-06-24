@@ -1,10 +1,10 @@
+
 // src/features/auth/pages/LoginPage.tsx
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLogin } from "@/features/auth/hooks/useAuthQueries";
-
-
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -23,28 +23,31 @@ export default function LoginPage() {
     try {
       console.log("Login attempt:", { username });
 
-      // 1. Login (sets HTTP-only cookie)
-      await loginMutate({ username, password });
+      // Login and set HTTP-only cookie
+      await loginMutate({
+        username,
+        password,
+      });
 
-      // 2. IMPORTANT: ensure session is loaded BEFORE navigation
-      await queryClient.fetchQuery({
+      // Refresh authenticated user cache
+      await queryClient.invalidateQueries({
         queryKey: ["me"],
       });
 
       console.log("AUTH READY");
 
-      // 3. Safe navigation
-      navigate("/dashboard", { replace: true });
-
-    } catch (err: any) {
+      navigate("/dashboard", {
+        replace: true,
+      });
+    } catch (err) {
       console.error("Login error:", err);
-      setError("Login failed or session invalid");
+
+      setError("Invalid username or password");
     }
   };
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-slate-950 overflow-hidden">
-
       {/* BACKGROUND */}
       <div className="absolute inset-0">
         <div className="absolute w-[500px] h-[500px] bg-blue-600/30 rounded-full blur-[120px] top-[-120px] left-[-120px]" />
@@ -72,7 +75,6 @@ export default function LoginPage() {
       {/* LOGIN CARD */}
       <div className="relative z-10 w-full max-w-md mx-4">
         <div className="bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl p-8">
-
           <h1 className="text-3xl font-bold text-white text-center">
             Welcome Back
           </h1>
@@ -82,25 +84,35 @@ export default function LoginPage() {
           </p>
 
           {error && (
-            <p className="text-red-400 text-center mb-3">{error}</p>
+            <p className="text-red-400 text-center mb-3">
+              {error}
+            </p>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-4">
-
+          <form
+            onSubmit={handleLogin}
+            className="space-y-4"
+          >
             <input
               type="text"
               placeholder="Username"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(e) =>
+                setUsername(e.target.value)
+              }
               className="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/50 outline-none focus:ring-2 focus:ring-blue-500"
+              required
             />
 
             <input
               type="password"
               placeholder="Password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) =>
+                setPassword(e.target.value)
+              }
               className="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/50 outline-none focus:ring-2 focus:ring-blue-500"
+              required
             />
 
             <button
@@ -108,9 +120,10 @@ export default function LoginPage() {
               disabled={isPending}
               className="w-full py-3 rounded-lg bg-blue-600 hover:bg-blue-700 font-semibold text-white disabled:opacity-50"
             >
-              {isPending ? "Signing in..." : "Sign In"}
+              {isPending
+                ? "Signing in..."
+                : "Sign In"}
             </button>
-
           </form>
 
           <div className="mt-6 flex justify-between text-sm text-white/60">
@@ -125,7 +138,6 @@ export default function LoginPage() {
               Create account
             </span>
           </div>
-
         </div>
 
         <p className="text-center text-white/40 text-xs mt-6">
@@ -135,3 +147,4 @@ export default function LoginPage() {
     </div>
   );
 }
+

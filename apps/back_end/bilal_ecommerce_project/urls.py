@@ -3,6 +3,7 @@ from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework.routers import DefaultRouter
+
 from bilal_ecommerce_project.views import (
     LogoutView,
     home_view,
@@ -13,69 +14,74 @@ from bilal_ecommerce_project.views import (
     TokenRefreshCookieView,
     csrf_token_view,
 )
-from products.views import CategoryViewSet, ProductViewSet
 
-
-
+from products.views import (
+    CategoryViewSet,
+    ProductViewSet,
+)
 
 # ─────────────────────────────────────
 # ROUTER
 # ─────────────────────────────────────
 router = DefaultRouter()
-router.register(r'categories', CategoryViewSet, basename='category')
-router.register(r'products', ProductViewSet, basename='product')
-
+router.register(r"categories", CategoryViewSet, basename="category")
+router.register(r"products", ProductViewSet, basename="product")
 
 # ─────────────────────────────────────
 # URL PATTERNS
 # ─────────────────────────────────────
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
 
     # HOME
-    path('', home_view, name='home'),
+    path("", home_view, name="home"),
 
-    # API ROUTER
-    path('api/', include(router.urls)),
+    # API V1
+    path("api/v1/", include([
 
-    # ───────── AUTH (COOKIE JWT) ─────────
-    path(
-        'api/token/',
-        TokenObtainPairCookieView.as_view(),
-        name='token_obtain_pair'
-    ),
+        # ROUTER
+        path("api/", include(router.urls)),
 
-    path(
-        'api/token/refresh/',
-        TokenRefreshCookieView.as_view(),
-        name='token_refresh'
-    ),
+        # AUTH
+        path(
+            "api/token/",
+            TokenObtainPairCookieView.as_view(),
+            name="token_obtain_pair",
+        ),
 
-    # ───────── USER ─────────
-    path(
-        'api/me/',
-        MeAPIView.as_view(),
-        name='me'
-    ),
+        path(
+            "api/token/refresh/",
+            TokenRefreshCookieView.as_view(),
+            name="token_refresh",
+        ),
 
-    path(
-        'api/register/',
-        register_user,
-        name='register'
-    ),
+        # USER
+        path(
+            "api/me/",
+            MeAPIView.as_view(),
+            name="me",
+        ),
 
-    # ───────── CSRF COOKIE ENDPOINT ─────────
-    path(
-        'api/csrf/',
-        csrf_token_view,
-        name='csrf_token'
-    ),
+        path(
+            "api/register/",
+            register_user,
+            name="register",
+        ),
 
-    path(
-        'api/logout/',
-        LogoutView.as_view(),
-        name='logout'
-    ),
+        # CSRF
+        path(
+            "api/csrf/",
+            csrf_token_view,
+            name="csrf_token",
+        ),
+
+        path(
+            "api/logout/",
+            LogoutView.as_view(),
+            name="logout",
+        ),
+
+    ])),
 ]
 
 # ─────────────────────────────────────
@@ -84,12 +90,12 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += static(
         settings.MEDIA_URL,
-        document_root=settings.MEDIA_ROOT
+        document_root=settings.MEDIA_ROOT,
     )
 
 # ─────────────────────────────────────
-# SPA FALLBACK (React Router)
+# SPA FALLBACK
 # ─────────────────────────────────────
 urlpatterns += [
-    re_path(r'^(?!api/).*$', spa),
+    re_path(r"^(?!api/).*$", spa),
 ]

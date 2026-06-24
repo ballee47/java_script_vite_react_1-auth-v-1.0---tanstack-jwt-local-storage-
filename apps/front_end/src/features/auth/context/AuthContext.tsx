@@ -1,18 +1,15 @@
 // src/features/auth/context/AuthContext.ts
-import { createContext } from "react";
 
-// ─────────────────────────────────────────
-// TYPE
-// ─────────────────────────────────────────
+import { createContext } from "react";
+import type { MeResponse } from "../api/login.api";
+
 export type AuthContextType = {
+  user: MeResponse | null;
   isAuthenticated: boolean;
   isLoadingAuth: boolean;
 };
 
-// ─────────────────────────────────────────
-// CONTEXT
-// ─────────────────────────────────────────
-export const AuthContext = createContext<AuthContextType>({
-  isAuthenticated: false,
-  isLoadingAuth: true,
-});
+export const AuthContext =
+  createContext<AuthContextType | undefined>(
+    undefined
+  );

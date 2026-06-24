@@ -1,6 +1,7 @@
+
 // src/features/products/api/product.api.ts
 
-import { axiosInstance } from "@/infra/http";
+import { apiGateway } from "@/infra/http/gateway/apiGateway";
 
 /* ─────────────────────────────────────────
    TYPES
@@ -26,54 +27,49 @@ export type CreateProductPayload = {
    ───────────────────────────────────────── */
 
 export const getProductsApi = async (): Promise<Product[]> => {
-  const { data } =
-    await axiosInstance.get<Product[]>(
-      "/api/products/"
-    );
-
-  return data;
+  return apiGateway.get<Product[]>(
+    "/api/products/"
+  );
 };
 
 export const getProductByIdApi = async (
   id: number
 ): Promise<Product> => {
-  const { data } =
-    await axiosInstance.get<Product>(
-      `/api/products/${id}/`
-    );
-
-  return data;
+  return apiGateway.get<Product>(
+    `/api/products/${id}/`
+  );
 };
 
 export const createProductApi = async (
   payload: CreateProductPayload
 ): Promise<Product> => {
-  const { data } =
-    await axiosInstance.post<Product>(
-      "/api/products/",
-      payload
-    );
-
-  return data;
+  return apiGateway.post<
+    Product,
+    CreateProductPayload
+  >(
+    "/api/products/",
+    payload
+  );
 };
 
 export const updateProductApi = async (
   id: number,
   payload: Partial<CreateProductPayload>
 ): Promise<Product> => {
-  const { data } =
-    await axiosInstance.put<Product>(
-      `/api/products/${id}/`,
-      payload
-    );
-
-  return data;
+  return apiGateway.put<
+    Product,
+    Partial<CreateProductPayload>
+  >(
+    `/api/products/${id}/`,
+    payload
+  );
 };
 
 export const deleteProductApi = async (
   id: number
 ): Promise<void> => {
-  await axiosInstance.delete(
+  await apiGateway.delete<void>(
     `/api/products/${id}/`
   );
 };
+

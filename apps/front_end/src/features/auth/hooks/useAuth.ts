@@ -1,35 +1,19 @@
+// src/features/auth/hooks/useAuth.ts
+
 import { useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
-import { useMe, useLogin, useLogout } from "./useAuthQueries";
+import {
+  AuthContext,
+  type AuthContextType,
+} from "../context/AuthContext";
 
-export function useAuth() {
-  const { isAuthenticated, isLoadingAuth } = useContext(AuthContext);
+export function useAuth(): AuthContextType {
+  const context = useContext(AuthContext);
 
-  const { data: user } = useMe();
-  const { mutate: login, isPending: isLoggingIn } = useLogin();
-  const { mutate: logoutMutation, isPending: isLoggingOut } = useLogout();
+  if (context === undefined) {
+    throw new Error(
+      "useAuth must be used within AuthProvider"
+    );
+  }
 
-  // ✅ WRAPPED LOGOUT (IMPORTANT FIX)
-  const logout = (variables?: any, options?: any) => {
-    logoutMutation(variables, {
-      ...options,
-      onSuccess: (...args: any[]) => {
-        // optional: force clean UI state sync
-        options?.onSuccess?.(...args);
-      },
-    });
-  };
-
-  return {
-    // state
-    user,
-    isAuthenticated,
-    isLoadingAuth,
-    isLoggingIn,
-    isLoggingOut,
-
-    // actions
-    login,
-    logout, // ✅ now controlled wrapper
-  };
+  return context;
 }
