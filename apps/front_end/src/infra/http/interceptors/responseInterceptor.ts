@@ -1,4 +1,3 @@
-
 import { axiosInstance } from "../client/axiosInstance";
 import { runRefresh } from "./refreshManager";
 import { addToQueue, resolveQueue, rejectQueue } from "./retryQueue";
@@ -17,17 +16,16 @@ export function responseInterceptor(error: any) {
   const url = originalRequest.url ?? "";
 
   /**
-   * Routes that should NEVER trigger refresh logic
+   * Routes that should NEVER trigger refresh
    */
-  const isAuthRoute =
+  const shouldSkipRefresh =
     url.includes("/api/token/") ||
     url.includes("/api/token/refresh/") ||
     url.includes("/api/register/") ||
     url.includes("/api/logout/") ||
-    url.includes("/api/me/") ||
     url.includes("/api/csrf/");
 
-  if (isAuthRoute) {
+  if (shouldSkipRefresh) {
     return Promise.reject(error);
   }
 
@@ -39,7 +37,7 @@ export function responseInterceptor(error: any) {
   }
 
   /**
-   * Prevent infinite retry loop
+   * Prevent infinite retry loops
    */
   if (originalRequest._retry) {
     return Promise.reject(error);
@@ -79,4 +77,3 @@ export function responseInterceptor(error: any) {
       isRefreshing = false;
     });
 }
-

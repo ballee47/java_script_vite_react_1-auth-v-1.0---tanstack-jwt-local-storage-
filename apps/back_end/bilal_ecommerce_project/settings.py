@@ -117,7 +117,7 @@ REST_FRAMEWORK = {
 
 # ✅ JWT — Token settings
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': __import__('datetime').timedelta(minutes=2),
+    'ACCESS_TOKEN_LIFETIME': __import__('datetime').timedelta(minutes=1),
     'REFRESH_TOKEN_LIFETIME': __import__('datetime').timedelta(days=3),
     'ALGORITHM': 'HS256',
 }
