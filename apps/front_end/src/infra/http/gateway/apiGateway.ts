@@ -26,7 +26,6 @@ const trace = async <T>(name: string, fn: () => Promise<T>) => {
 export const apiGateway = {
   get: <T>(url: string) =>
     trace(`GET ${url}`, async () => {
-      console.log("🚀 API GATEWAY GET", url);
       logger.info("GET", { url });
       return httpClient.get<T>(withVersion(url));
     }),
