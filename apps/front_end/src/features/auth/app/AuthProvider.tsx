@@ -5,24 +5,26 @@ import { AuthContext } from "../context/AuthContext";
 import { useMe } from "../hooks/useAuthQueries";
 import { axiosInstance } from "@/infra/http/client/axiosInstance";
 
-export function AuthProvider({
-  children,
-}: {
+interface Props {
   children: React.ReactNode;
-}) {
-  const { data: user, isLoading } = useMe();
+}
 
+export function AuthProvider({ children }: Props) {
+  const {
+    data: user,
+    isLoading,
+  } = useMe();
+
+  // Initialize CSRF cookie once when app starts
   useEffect(() => {
-    axiosInstance
-      .get("/api/v1/api/csrf/")
-      .catch(() => {});
+    axiosInstance.get("/api/v1/api/csrf/").catch(() => {});
   }, []);
 
   return (
     <AuthContext.Provider
       value={{
         user: user ?? null,
-        isAuthenticated: !!user,
+        isAuthenticated: Boolean(user),
         isLoadingAuth: isLoading,
       }}
     >
