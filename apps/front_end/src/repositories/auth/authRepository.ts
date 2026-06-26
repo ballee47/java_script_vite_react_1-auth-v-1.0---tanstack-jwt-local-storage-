@@ -1,7 +1,7 @@
 import { apiGateway } from "@/infra/http/gateway/apiGateway";
 
 export const authRepository = {
-  login: <TResponse,TRequest>(
+  login: <TRequest, TResponse>(
     endpoint: string,
     payload: TRequest
   ) =>
