@@ -1,32 +1,30 @@
 import { axiosInstance } from "../client/axiosInstance";
-
 import {
   isRefreshing,
-  getRefreshPromise,
   setRefreshPromise,
   clearRefreshPromise,
 } from "./refreshState";
-
 import { executeRefresh } from "./refreshExecutor";
-
 import {
   enqueue,
   resolveAll,
   rejectAll,
 } from "./refreshQueue";
-
 import { expireSession } from "./sessionManager";
-
 import type { InternalRequestConfig } from "../types/request/internalRequestConfig";
 
+
+
+
+
 /**
- * Handles a request that failed with 401.
+ * Handles a request that failed with HTTP 401.
  */
 export async function handle401(
   request: InternalRequestConfig
-) {
-  // Another refresh is already running.
-  // Queue this request.
+): Promise<unknown> {
+  // A refresh operation is already in progress.
+  // Queue the request until the refresh completes.
   if (isRefreshing()) {
     return new Promise((resolve, reject) => {
       enqueue({
@@ -37,20 +35,23 @@ export async function handle401(
     });
   }
 
-  // Start a new refresh operation.
-  const refresh = executeRefresh();
+  const refreshPromise = executeRefresh();
 
-  setRefreshPromise(refresh);
+  setRefreshPromise(refreshPromise);
 
   try {
-    await refresh;
+    await refreshPromise;
 
+    // Retry every queued request.
     resolveAll();
 
+    // Retry the current request.
     return axiosInstance(request);
   } catch (error) {
+    // Reject every queued request.
     rejectAll(error);
 
+    // Expire the user's session.
     await expireSession();
 
     throw error;
