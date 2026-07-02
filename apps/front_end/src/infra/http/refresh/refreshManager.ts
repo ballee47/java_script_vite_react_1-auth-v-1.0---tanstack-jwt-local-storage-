@@ -13,16 +13,20 @@ import {
 import { expireSession } from "./sessionManager";
 import type { InternalRequestConfig } from "../types/request/internalRequestConfig";
 
-
-
-
-
 /**
  * Handles a request that failed with HTTP 401.
  */
 export async function handle401(
   request: InternalRequestConfig
 ): Promise<unknown> {
+  // Prevent infinite refresh loops.
+  if (request._retry) {
+    throw new Error("Request has already been retried.");
+  }
+
+  // Mark this request as retried.
+  request._retry = true;
+
   // A refresh operation is already in progress.
   // Queue the request until the refresh completes.
   if (isRefreshing()) {
