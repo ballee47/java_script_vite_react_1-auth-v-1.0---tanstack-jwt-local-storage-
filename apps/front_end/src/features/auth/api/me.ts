@@ -1,9 +1,9 @@
 import { authRepository } from "@/repositories/auth";
-import { ENDPOINTS } from "@/infra/http/api/endpoints";
+import { AUTH_ENDPOINTS } from "@/infra/http/api/endpoints";
 
 export const meApi = <
   TResponse
 >() =>
   authRepository.me<TResponse>(
-    ENDPOINTS.auth.me
+    AUTH_ENDPOINTS.ME
   );

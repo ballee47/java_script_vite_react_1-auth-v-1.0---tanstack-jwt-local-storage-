@@ -1,6 +1,7 @@
 
 // src/infra/http/auth/logout.ts
 
+import { AUTH_ENDPOINTS } from "../api/endpoints";
 import { apiGateway } from "../gateway/apiGateway";
 
 let logoutPromise: Promise<void> | null = null;
@@ -13,7 +14,7 @@ export const logout = async (): Promise<void> => {
   logoutPromise = (async () => {
     try {
       await apiGateway.post<void, void>(
-        "/api/logout/"
+        AUTH_ENDPOINTS.LOGOUT
       );
     } catch (error) {
       console.error("Logout failed:", error);

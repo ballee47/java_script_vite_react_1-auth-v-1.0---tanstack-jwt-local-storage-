@@ -1,6 +1,7 @@
-import { apiGateway } from "@/infra/http/gateway/apiGateway";
+import { authGateway } from "./authGateway";
 
 /* LOGIN */
+
 export type LoginPayload = {
   username: string;
   password: string;
@@ -10,43 +11,38 @@ export type LoginResponse = {
   message: string;
 };
 
-export const loginApi = async (
+export const loginApi = (
   payload: LoginPayload
 ): Promise<LoginResponse> => {
-  return apiGateway.post<LoginResponse, LoginPayload>(
-    "/api/token/",
-    payload,
-  
+  return authGateway.login<LoginResponse, LoginPayload>(
+    payload
   );
 };
 
 /* ME */
+
 export type MeResponse = {
   id: number;
   username: string;
   email: string;
 };
 
-export const fetchMeApi = async (): Promise<MeResponse> => {
-  return apiGateway.get<MeResponse>(
-    "/api/me/",
-   
-  );
+export const fetchMeApi = (): Promise<MeResponse> => {
+  return authGateway.me<MeResponse>();
 };
 
 /* SIGNUP */
+
 export type SignupPayload = {
   username: string;
   email: string;
   password: string;
 };
 
-export const signupApi = async (
+export const signupApi = (
   payload: SignupPayload
 ): Promise<void> => {
-  await apiGateway.post<void, SignupPayload>(
-    "/api/register/",
-    payload,
-  
+  return authGateway.register<void, SignupPayload>(
+    payload
   );
 };

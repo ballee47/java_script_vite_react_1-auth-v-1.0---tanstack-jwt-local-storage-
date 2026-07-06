@@ -1,9 +1,8 @@
-// src/features/auth/app/AuthProvider.tsx
-
 import { useEffect } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useMe } from "../hooks/useAuthQueries";
 import { axiosInstance } from "@/infra/http/client/axiosInstance";
+import { AUTH_ENDPOINTS } from "@/infra/http/api/endpoints";
 
 interface Props {
   children: React.ReactNode;
@@ -15,9 +14,10 @@ export function AuthProvider({ children }: Props) {
     isLoading,
   } = useMe();
 
-  // Initialize CSRF cookie once when app starts
   useEffect(() => {
-    axiosInstance.get("/api/v1/api/csrf/").catch(() => {});
+    axiosInstance
+      .get(AUTH_ENDPOINTS.CSRF)
+      .catch(() => {});
   }, []);
 
   return (

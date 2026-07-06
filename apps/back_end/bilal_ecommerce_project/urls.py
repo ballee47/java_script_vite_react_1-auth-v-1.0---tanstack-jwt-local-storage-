@@ -5,9 +5,9 @@ from django.conf.urls.static import static
 from rest_framework.routers import DefaultRouter
 
 from bilal_ecommerce_project.views import (
-    LogoutView,
     home_view,
     spa,
+    LogoutView,
     MeAPIView,
     register_user,
     TokenObtainPairCookieView,
@@ -20,82 +20,78 @@ from products.views import (
     ProductViewSet,
 )
 
-# ─────────────────────────────────────
-# ROUTER
-# ─────────────────────────────────────
+# -----------------------------
+# Router
+# -----------------------------
 router = DefaultRouter()
 router.register(r"categories", CategoryViewSet, basename="category")
 router.register(r"products", ProductViewSet, basename="product")
 
-# ─────────────────────────────────────
-# URL PATTERNS
-# ─────────────────────────────────────
+# -----------------------------
+# URLs
+# -----------------------------
 urlpatterns = [
     path("admin/", admin.site.urls),
 
-    # HOME
     path("", home_view, name="home"),
 
-    # API V1
     path("api/v1/", include([
 
-        # ROUTER
-        path("api/", include(router.urls)),
-
-        # AUTH
+        # Authentication
         path(
-            "api/token/",
+            "auth/login/",
             TokenObtainPairCookieView.as_view(),
-            name="token_obtain_pair",
+            name="login",
         ),
 
         path(
-            "api/token/refresh/",
+            "auth/refresh/",
             TokenRefreshCookieView.as_view(),
-            name="token_refresh",
+            name="refresh",
         ),
 
-        # USER
         path(
-            "api/me/",
+            "auth/logout/",
+            LogoutView.as_view(),
+            name="logout",
+        ),
+
+        path(
+            "auth/register/",
+            register_user,
+            name="register",
+        ),
+
+        path(
+            "auth/me/",
             MeAPIView.as_view(),
             name="me",
         ),
 
         path(
-            "api/register/",
-            register_user,
-            name="register",
-        ),
-
-        # CSRF
-        path(
-            "api/csrf/",
+            "auth/csrf/",
             csrf_token_view,
-            name="csrf_token",
+            name="csrf",
         ),
 
-        path(
-            "api/logout/",
-            LogoutView.as_view(),
-            name="logout",
-        ),
+        # Business Resources
+        path("", include(router.urls)),
 
     ])),
 ]
 
-# ─────────────────────────────────────
-# MEDIA (DEV ONLY)
-# ─────────────────────────────────────
+# -----------------------------
+# Media (Development)
+# -----------------------------
 if settings.DEBUG:
     urlpatterns += static(
         settings.MEDIA_URL,
         document_root=settings.MEDIA_ROOT,
     )
 
-# ─────────────────────────────────────
-# SPA FALLBACK
-# ─────────────────────────────────────
+# -----------------------------
+# SPA Fallback
+# -----------------------------
 urlpatterns += [
     re_path(r"^(?!api/).*$", spa),
 ]

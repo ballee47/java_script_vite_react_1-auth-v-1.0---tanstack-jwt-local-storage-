@@ -1,7 +1,8 @@
-import { BASE_URL } from "@/infra/http/config/baseURL";
+import { API_PREFIX } from "../config/apiConfig";
+
 
 export const httpConfig = {
-  baseURL: BASE_URL,
+  baseURL: API_PREFIX,
 
   timeout: 15000,
 

@@ -1,12 +1,8 @@
-import axios from "axios";
-import { httpConfig } from "../client/config";
+import { axiosInstance } from "@/infra/http/client/axiosInstance";
+import { AUTH_ENDPOINTS } from "@/infra/http/api/endpoints";
 
 export async function refreshToken(): Promise<void> {
-  await axios.post(
-    `${httpConfig.baseURL}/api/v1/api/token/refresh/`,
-    {},
-    {
-      withCredentials: true,
-    }
+  await axiosInstance.post(
+    AUTH_ENDPOINTS.REFRESH
   );
 }

@@ -1,7 +1,7 @@
 import { authRepository } from "@/repositories/auth";
-import { ENDPOINTS } from "@/infra/http/api/endpoints";
+import { AUTH_ENDPOINTS } from "@/infra/http/api/endpoints";
 
 export const logoutApi = () =>
   authRepository.logout(
-    ENDPOINTS.auth.logout
+    AUTH_ENDPOINTS.LOGOUT
   );

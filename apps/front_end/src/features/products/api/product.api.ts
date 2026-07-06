@@ -28,7 +28,7 @@ export type CreateProductPayload = {
 
 export const getProductsApi = async (): Promise<Product[]> => {
   return apiGateway.get<Product[]>(
-    "/api/products/"
+    "/products/"
   );
 };
 

@@ -1,5 +1,5 @@
 import { authRepository } from "@/repositories/auth";
-import { ENDPOINTS } from "@/infra/http/api/endpoints";
+import { AUTH_ENDPOINTS } from "@/infra/http/api/endpoints";
 
 export const loginApi = <
   TRequest,
@@ -11,6 +11,6 @@ export const loginApi = <
     TRequest,
     TResponse
   >(
-    ENDPOINTS.auth.login,
+    AUTH_ENDPOINTS.LOGIN,
     payload
   );

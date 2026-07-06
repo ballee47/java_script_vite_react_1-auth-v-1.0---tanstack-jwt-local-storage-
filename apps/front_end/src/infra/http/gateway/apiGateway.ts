@@ -2,7 +2,6 @@ import { httpClient } from "../client/httpClient";
 import { logger } from "../observability/logger";
 import { tracer } from "../observability/tracer";
 import { metrics } from "../observability/metrics";
-import { withVersion } from "../config/apiVersion";
 
 const trace = async <T>(name: string, fn: () => Promise<T>) => {
   const span = tracer.startSpan(name);
@@ -23,61 +22,71 @@ const trace = async <T>(name: string, fn: () => Promise<T>) => {
 };
 
 export const apiGateway = {
-  get: <T>(url: string) =>
+  get: <TResponse>(
+    url: string,
+    params?: Record<string, unknown>
+  ) =>
     trace(`GET ${url}`, async () => {
-      logger.info("GET", { url });
+      logger.info("GET", { url, params });
 
-      return httpClient.request<T>({
+      return httpClient.request<TResponse>({
         method: "GET",
-        url: withVersion(url),
-
+        url,
+        params,
       });
     }),
 
-  post: <T, D>(url: string, data?: D) =>
+  post: <TResponse, TRequest>(
+    url: string,
+    data?: TRequest
+  ) =>
     trace(`POST ${url}`, async () => {
       logger.info("POST", { url, data });
 
-      return httpClient.request<T>({
+      return httpClient.request<TResponse>({
         method: "POST",
-        url: withVersion(url),
+        url,
         data,
       });
     }),
 
-  put: <T, D>(url: string, data: D) =>
+  put: <TResponse, TRequest>(
+    url: string,
+    data: TRequest
+  ) =>
     trace(`PUT ${url}`, async () => {
       logger.info("PUT", { url, data });
 
-      return httpClient.request<T>({
+      return httpClient.request<TResponse>({
         method: "PUT",
-        url: withVersion(url),
+        url,
         data,
       });
     }),
 
-  patch: <T, D>(url: string, data: D) =>
+  patch: <TResponse, TRequest>(
+    url: string,
+    data: TRequest
+  ) =>
     trace(`PATCH ${url}`, async () => {
       logger.info("PATCH", { url, data });
 
-      return httpClient.request<T>({
+      return httpClient.request<TResponse>({
         method: "PATCH",
-        url: withVersion(url),
+        url,
         data,
       });
     }),
 
-  delete: <T>(url: string) =>
+  delete: <TResponse>(url: string) =>
     trace(`DELETE ${url}`, async () => {
       logger.info("DELETE", { url });
 
-      return httpClient.request<T>({
+      return httpClient.request<TResponse>({
         method: "DELETE",
-        url: withVersion(url),
+        url,
       });
     }),
 
-  batch: async <T>(requests: Promise<T>[]) => {
-    return Promise.all(requests);
-  },
+  batch: <T>(requests: Promise<T>[]) => Promise.all(requests),
 };
