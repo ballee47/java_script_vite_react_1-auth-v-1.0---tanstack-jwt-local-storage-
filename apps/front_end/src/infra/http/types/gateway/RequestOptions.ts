@@ -1,7 +1,11 @@
 // src/infra/http/types/gateway/RequestOptions.ts
 
-import type { RequestParams } from "./RequestParams";
+import { RequestParams } from "./RequestParams";
 
+
+
+
+    
 /**
  * Common options shared by all HTTP methods.
  */
