@@ -1,7 +1,7 @@
 import { AxiosError } from "axios";
 
 import { AUTH_ROUTES } from "../auth/authRoutes";
-import { handle401 } from "../refresh/refreshManager";
+import { handle401 } from "../refresh/index";
 import { errorMapper } from "../errors/errorMapper";
 
 import type { InternalRequestConfig } from "../types/request/internalRequestConfig";
