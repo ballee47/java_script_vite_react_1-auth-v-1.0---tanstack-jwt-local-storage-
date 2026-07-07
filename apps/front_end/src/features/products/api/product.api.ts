@@ -1,26 +1,13 @@
-
 // src/features/products/api/product.api.ts
 
 import { apiGateway } from "@/infra/http/gateway/apiGateway";
+import { PRODUCT_ENDPOINTS } from "@/infra/http/api/endpoints/product";
 
-/* ─────────────────────────────────────────
-   TYPES
-   ───────────────────────────────────────── */
-
-export type Product = {
-  id: number;
-  name: string;
-  price: number;
-  description?: string;
-  image: string;
-};
-
-export type CreateProductPayload = {
-  name: string;
-  price: number;
-  description?: string;
-  image: string;
-};
+import {
+  Product,
+  CreateProductPayload,
+  UpdateProductPayload,
+} from "../types";
 
 /* ─────────────────────────────────────────
    API FUNCTIONS
@@ -28,7 +15,7 @@ export type CreateProductPayload = {
 
 export const getProductsApi = async (): Promise<Product[]> => {
   return apiGateway.get<Product[]>(
-    "/products/"
+    PRODUCT_ENDPOINTS.LIST
   );
 };
 
@@ -36,7 +23,7 @@ export const getProductByIdApi = async (
   id: number
 ): Promise<Product> => {
   return apiGateway.get<Product>(
-    `/api/products/${id}/`
+    PRODUCT_ENDPOINTS.BY_ID(id)
   );
 };
 
@@ -47,20 +34,20 @@ export const createProductApi = async (
     Product,
     CreateProductPayload
   >(
-    "/api/products/",
+    PRODUCT_ENDPOINTS.CREATE,
     payload
   );
 };
 
 export const updateProductApi = async (
   id: number,
-  payload: Partial<CreateProductPayload>
+  payload: UpdateProductPayload
 ): Promise<Product> => {
   return apiGateway.put<
     Product,
-    Partial<CreateProductPayload>
+    UpdateProductPayload
   >(
-    `/api/products/${id}/`,
+    PRODUCT_ENDPOINTS.UPDATE(id),
     payload
   );
 };
@@ -69,7 +56,6 @@ export const deleteProductApi = async (
   id: number
 ): Promise<void> => {
   await apiGateway.delete<void>(
-    `/api/products/${id}/`
+    PRODUCT_ENDPOINTS.DELETE(id)
   );
 };
-
