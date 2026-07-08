@@ -1,7 +1,6 @@
 // src/guards/GuestRoute.tsx
 import { Navigate, Outlet } from "react-router-dom";
-import { tokenStorage } from "@/infra/storage/cookieStorage";
-
+import { tokenStorage } from "../infra/storage/tokenStorage";
 export default function GuestRoute() {
 
   // if already logged in — redirect away from login/signup

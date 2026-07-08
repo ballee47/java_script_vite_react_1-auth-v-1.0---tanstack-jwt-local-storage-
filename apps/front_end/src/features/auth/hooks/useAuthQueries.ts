@@ -2,11 +2,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { loginApi, fetchMeApi } from "../api/login.api";
 import { logout as logoutApi } from "@/infra/http/auth/logout";
 import { queryKeys } from "@/query/keys";
-import { clearAllStorage } from "@/infra/storage/cookieStorage";
+import { clearStorage } from "@/infra/storage";
 
 /* =====================================================
    LOGIN
 ===================================================== */
+
 export const useLogin = () => {
   const queryClient = useQueryClient();
 
@@ -28,31 +29,23 @@ export const useLogin = () => {
 /* =====================================================
    CURRENT USER
 ===================================================== */
+
 export const useMe = () => {
   return useQuery({
     queryKey: queryKeys.me,
-    queryFn: async () => {
-      // Backend sets HttpOnly cookies; don't rely on document.cookie.
-      // Try fetching the current user; server returns 401 if unauthenticated.
-      return fetchMeApi();
-    },
+    queryFn: fetchMeApi,
 
     retry: false,
-
     staleTime: 0,
-
     gcTime: 0,
-
     refetchOnWindowFocus: false,
-
     refetchOnReconnect: false,
-
     refetchOnMount: true,
   });
 };
 
 /* =====================================================
-   LOGOUT (FIXED - REAL API + CLEAN CACHE RESET)
+   LOGOUT
 ===================================================== */
 
 export const useLogout = () => {
@@ -62,15 +55,13 @@ export const useLogout = () => {
     mutationFn: logoutApi,
 
     onSettled: () => {
-      clearAllStorage();
+      clearStorage();
 
-      // Force AuthProvider to see "logged out"
       queryClient.setQueryData(
         queryKeys.me,
         null
       );
 
-      // Optional: remove other cached data
       queryClient.removeQueries({
         queryKey: queryKeys.me,
         exact: true,
@@ -78,4 +69,3 @@ export const useLogout = () => {
     },
   });
 };
-
