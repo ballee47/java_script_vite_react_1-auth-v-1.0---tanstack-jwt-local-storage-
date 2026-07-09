@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { loginApi, fetchMeApi } from "../api/login.api";
 import { logout as logoutApi } from "@/infra/http/auth/logout";
 import { queryKeys } from "@/query/keys";
-import { clearStorage } from "@/infra/storage";
+import { clearStorage } from "@/infra/storage1";
 
 /* =====================================================
    LOGIN
