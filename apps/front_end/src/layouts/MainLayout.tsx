@@ -1,51 +1,99 @@
-import { useState } from "react";
-import { Outlet, Link } from "react-router-dom";
-import Navbar from "@/layouts/Navbar";
-import Footer from "./Footer";
+// src/features/products/pages/ProductPage.tsx
 
-export default function MainLayout() {
-  const [open, setOpen] = useState(false);
+import { useState } from "react";
+import Hero from "@/shared/components/Hero";
+import { useProducts } from "../features/products/hooks/useProducts";
+import ProductGrid from "../features/products/components/ProductGrid";
+import ProductDetails from "../features/products/components/ProductDetails";
+import { Product } from "@/features/products/types/product";
+
+export default function ProductPage() {
+  const {
+    data: products = [],
+    isLoading,
+    error,
+  } = useProducts();
+
+  const [selectedProduct, setSelectedProduct] =
+    useState<Product | null>(null);
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
+    <div className="min-h-screen bg-slate-900">
 
-      {/* NAVBAR */}
-      <Navbar setOpen={setOpen} />
+      <Hero backgroundImage="https://res.cloudinary.com/dos573rav/image/upload/v1776948049/login_trfkmw.jpg">
 
-      {/* SIDEBAR */}
-      <div
-        className={`
-          fixed top-0 left-0 h-full w-[260px]
-          bg-slate-900 text-white p-5 z-[1000]
-          shadow-2xl transition-transform duration-300 ease-in-out
-          ${open ? "translate-x-0" : "-translate-x-full"}
-        `}
-      >
-        <h2 className="mb-5 text-lg font-bold">📦 Dashboard</h2>
+        <div className="py-16 text-center">
 
-        {/* ✅ FIXED NAVIGATION (NO <a href>) */}
-        <nav className="flex flex-col gap-3">
-          <Link to="/" className="sidebar-link">🏠 Home</Link>
-          <Link to="/products" className="sidebar-link">🛍 Products</Link>
-          <Link to="/cart" className="sidebar-link">🛒 Cart</Link>
-        </nav>
-      </div>
+          <h1 className="text-4xl font-bold text-white">
+            Explore Products
+          </h1>
 
-      {/* OVERLAY */}
-      {open && (
-        <div
-          onClick={() => setOpen(false)}
-          className="fixed inset-0 bg-black/50 z-[999]"
-        />
-      )}
+          <p className="mt-3 text-white/60">
+            Discover amazing items from our store.
+          </p>
 
-      {/* MAIN CONTENT */}
-      <main className="flex-1 p-0">
-        <Outlet />
-      </main>
+        </div>
 
-      {/* FOOTER */}
-      <Footer />
+      </Hero>
+
+      <section className="px-6 py-10">
+
+        {isLoading && (
+
+          <p className="text-center text-white">
+
+            Loading products...
+
+          </p>
+
+        )}
+
+        {error && (
+
+          <p className="text-center text-red-500">
+
+            Failed to load products.
+
+          </p>
+
+        )}
+
+        {!isLoading &&
+          !error &&
+          products.length === 0 && (
+
+            <p className="text-center text-white/60">
+
+              No products found.
+
+            </p>
+
+          )}
+
+        {!isLoading &&
+          !error &&
+          products.length > 0 && (
+
+            selectedProduct ? (
+
+              <ProductDetails
+                product={selectedProduct}
+                onBack={() => setSelectedProduct(null)}
+              />
+
+            ) : (
+
+              <ProductGrid
+                products={products}
+                onSelect={setSelectedProduct}
+              />
+
+            )
+
+          )}
+
+      </section>
+
     </div>
   );
 }
