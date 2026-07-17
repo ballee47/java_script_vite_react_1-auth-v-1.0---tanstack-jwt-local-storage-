@@ -7,6 +7,11 @@ export const StorageLimits = {
    */
   MAX_KEY_LENGTH: 256,
 
+/**
+   * Minimum storage key length.
+   */
+  MIN_KEY_LENGTH: 1,
+
   /**
    * Maximum namespace length.
    */

@@ -59,7 +59,7 @@ export abstract class DefaultStorageValidator {
   /**
    * Checks whether a string is empty.
    */
-  protected isEmpty(value: string): boolean {
+  protected isEmpty(value: string ): boolean {
     return value.trim().length === 0;
   }
 
@@ -75,5 +75,20 @@ export abstract class DefaultStorageValidator {
    */
   protected belowMinLength(value: string, min: number): boolean {
     return value.length < min;
+    }
+
+ /**
+   * Checks whether is that is a reseverd key word or not.
+   * @param key - The key to check.
+   * @returns True if the key is reserved, false otherwise.
+   */
+
+  protected isReservedKey(key: string): boolean {
+    const reservedKeys = ["__proto__", "constructor", "prototype"];
+    return reservedKeys.includes(key);
   }
+   
+
+
+  
 }
