@@ -59,17 +59,4 @@ export class KeyValidator extends DefaultStorageValidator {
       );
     }
   }
-
-  /**
-   * Checks whether the key is reserved.
-   */
-  protected isReservedKey(key: string): boolean {
-    const reservedKeys = [
-      "__proto__",
-      "prototype",
-      "constructor",
-    ];
-
-    return reservedKeys.includes(key);
-  }
 }
