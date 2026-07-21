@@ -6,7 +6,7 @@ export class StorageSetValidator {
     private readonly keyValidator: KeyValidator,
     private readonly valueValidator: ValueValidator
   ) {}
-
+   
   /**
    * Validates a storage set operation.
    */
