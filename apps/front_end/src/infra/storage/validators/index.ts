@@ -1,3 +1,6 @@
-export { StorageGetValidator } from "./StorageGetValidator";
-export { StorageSetValidator } from "./StorageSetValidator";
-export { StorageRemoveValidator } from "./StorageRemoveValidator";
+export * from "./KeyValidator";
+export * from "./ValueValidator";
+export * from "./SchemaValidator";
+export * from "./StorageSetValidator";
+export * from "./StorageGetValidator";
+export * from "./StorageRemoveValidator";
