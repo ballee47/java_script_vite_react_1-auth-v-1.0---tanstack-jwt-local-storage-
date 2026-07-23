@@ -1,81 +1,71 @@
-import { StorageAdapter } from "../types";
+import { StorageAdapter } from "../types/StorageAdapter";
 
 export abstract class BaseStorageAdapter
   implements StorageAdapter
 {
-  constructor(
-    protected readonly storage: Storage
+  protected constructor(
+    protected readonly namespace: string = ""
   ) {}
 
   /**
-   * Stores a string value.
+   * Normalizes a storage key.
    */
-  public set(
+  protected normalizeKey(
+    key: string
+  ): string {
+    return key.trim();
+  }
+
+  /**
+   * Builds the final storage key.
+   */
+  protected buildKey(
+    key: string
+  ): string {
+    const normalizedKey = this.normalizeKey(key);
+
+    return this.namespace
+      ? `${this.namespace}:${normalizedKey}`
+      : normalizedKey;
+  }
+
+  /**
+   * Throws a storage-related error.
+   */
+  protected throwStorageError(
+    message: string
+  ): never {
+    throw new Error(message);
+  }
+
+  /**
+   * Checks whether the storage is available.
+   */
+  public abstract isAvailable(): boolean;
+
+  /**
+   * Storage operations.
+   */
+  public abstract set(
     key: string,
     value: string
-  ): void {
-    this.storage.setItem(key, value);
-  }
+  ): void;
 
-  /**
-   * Retrieves a string value.
-   */
-  public get(
+  public abstract get(
     key: string
-  ): string | null {
-    return this.storage.getItem(key);
-  }
+  ): string | null;
 
-  /**
-   * Removes a value by its key.
-   */
-  public remove(
+  public abstract remove(
     key: string
-  ): void {
-    this.storage.removeItem(key);
-  }
+  ): void;
 
-  /**
-   * Removes all stored values.
-   */
-  public clear(): void {
-    this.storage.clear();
-  }
+  public abstract clear(): void;
 
-  /**
-   * Checks whether a key exists.
-   */
-  public has(
+  public abstract has(
     key: string
-  ): boolean {
-    return this.storage.getItem(key) !== null;
-  }
+  ): boolean;
 
-  /**
-   * Returns all stored keys.
-   */
-  public keys(): string[] {
-    const keys: string[] = [];
+  public abstract keys(): string[];
 
-    for (
-      let index = 0;
-      index < this.storage.length;
-      index++
-    ) {
-      const key = this.storage.key(index);
-
-      if (key !== null) {
-        keys.push(key);
-      }
-    }
-
-    return keys;
-  }
-
-  /**
-   * Returns the total number of stored items.
-   */
-  public size(): number {
-    return this.storage.length;
-  }
+  public abstract size(): number;
 }

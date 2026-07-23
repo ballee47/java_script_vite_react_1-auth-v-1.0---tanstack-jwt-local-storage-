@@ -1,21 +1,11 @@
-import { StorageAdapter } from "../types";
+import { BaseStorageAdapter } from "./BaseStorageAdapter";
 
-export class LocalStorageAdapter implements StorageAdapter {
-  constructor(
-    private readonly storage: Storage = localStorage
-  ) {}
-
-
-
-  public isAvailable(): boolean {
-    try {
-      const testKey = "__storage_test__";
-      this.storage.setItem(testKey, "test");
-      this.storage.removeItem(testKey);
-      return true;
-    } catch (error) {
-      return false;
-    }
+export abstract class BrowserStorageAdapter extends BaseStorageAdapter {
+  protected constructor(
+    protected readonly storage: Storage,
+    namespace: string = ""
+  ) {
+    super(namespace);
   }
 
   /**
@@ -25,7 +15,7 @@ export class LocalStorageAdapter implements StorageAdapter {
     key: string,
     value: string
   ): void {
-    this.storage.setItem(key, value);
+    this.storage.setItem(this.buildKey(key), value);
   }
 
   /**
@@ -34,20 +24,20 @@ export class LocalStorageAdapter implements StorageAdapter {
   public get(
     key: string
   ): string | null {
-    return this.storage.getItem(key);
+    return this.storage.getItem(this.buildKey(key));
   }
 
   /**
-   * Removes a value by its key.
+   * Removes a stored value.
    */
   public remove(
     key: string
   ): void {
-    this.storage.removeItem(key);
+    this.storage.removeItem(this.buildKey(key));
   }
 
   /**
-   * Removes all stored values.
+   * Clears all stored values.
    */
   public clear(): void {
     this.storage.clear();
@@ -59,11 +49,11 @@ export class LocalStorageAdapter implements StorageAdapter {
   public has(
     key: string
   ): boolean {
-    return this.storage.getItem(key) !== null;
+    return this.get(key) !== null;
   }
 
   /**
-   * Returns all storage keys.
+   * Returns all stored keys.
    */
   public keys(): string[] {
     const keys: string[] = [];
@@ -80,7 +70,7 @@ export class LocalStorageAdapter implements StorageAdapter {
   }
 
   /**
-   * Returns the total number of stored items.
+   * Returns the number of stored items.
    */
   public size(): number {
     return this.storage.length;
