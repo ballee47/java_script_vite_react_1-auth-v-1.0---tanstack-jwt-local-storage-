@@ -1,29 +1,24 @@
-import { StorageSetOptions } from "./StorageSetOptions";
-import { StorageGetOptions } from "./StorageGetOptions";
-import { StorageRemoveOptions } from "./StorageRemoveOptions";
+
 
 export interface StorageAdapter {
-    set<T>(
-        key: string,
-        value: T,
-        options?: StorageSetOptions
-    ): void;
+  set(
+    key: string,
+    value: string
+  ): void;
 
-    get<T>(
-        key: string,
-        options?: StorageGetOptions
-    ): T | null;
+  get(
+    key: string
+  ): string | null;
 
-    remove(
-        key: string,
-        options?: StorageRemoveOptions
-    ): void;
+  remove(
+    key: string
+  ): void;
 
-    clear(): void;
+  clear(): void;
 
-    has(key: string): boolean;
+  has(key: string): boolean;
 
-    keys(): string[];
+  keys(): string[];
 
-    size(): number;
+  size(): number;
 }

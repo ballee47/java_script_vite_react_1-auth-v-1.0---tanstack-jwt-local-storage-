@@ -1,8 +1,10 @@
 import { StorageAdapter } from "../types";
 
-export class LocalStorageAdapter implements StorageAdapter {
+export abstract class BaseStorageAdapter
+  implements StorageAdapter
+{
   constructor(
-    private readonly storage: Storage = localStorage
+    protected readonly storage: Storage
   ) {}
 
   /**
@@ -50,12 +52,16 @@ export class LocalStorageAdapter implements StorageAdapter {
   }
 
   /**
-   * Returns all storage keys.
+   * Returns all stored keys.
    */
   public keys(): string[] {
     const keys: string[] = [];
 
-    for (let index = 0; index < this.storage.length; index++) {
+    for (
+      let index = 0;
+      index < this.storage.length;
+      index++
+    ) {
       const key = this.storage.key(index);
 
       if (key !== null) {
