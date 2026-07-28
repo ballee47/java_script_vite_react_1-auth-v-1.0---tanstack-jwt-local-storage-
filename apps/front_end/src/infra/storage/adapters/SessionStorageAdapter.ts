@@ -5,7 +5,7 @@ export class SessionStorageAdapter extends BrowserStorageAdapter {
     super(sessionStorage, namespace);
   }
 
-  public isAvailable(): boolean {
+  public override  isAvailable(): boolean {
     return (
       typeof window !== "undefined" &&
       "sessionStorage" in window

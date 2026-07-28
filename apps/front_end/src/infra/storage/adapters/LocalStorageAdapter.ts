@@ -1,88 +1,23 @@
-import { StorageAdapter } from "../types";
+import { BrowserStorageAdapter } from "./BrowserStorageAdapter";
 
-export class LocalStorageAdapter implements StorageAdapter {
-  constructor(
-    private readonly storage: Storage = localStorage
-  ) {}
+export class LocalStorageAdapter extends BrowserStorageAdapter {
+  constructor(namespace?: string) {
+    super(localStorage, namespace);
+  }
 
-
-
-  public isAvailable(): boolean {
+  /**
+   * Checks whether localStorage is available in the current environment.
+   */
+  public override isAvailable(): boolean {
     try {
       const testKey = "__storage_test__";
-      this.storage.setItem(testKey, "test");
-      this.storage.removeItem(testKey);
+
+      localStorage.setItem(testKey, testKey);
+      localStorage.removeItem(testKey);
+
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
-  }
-
-  /**
-   * Stores a string value.
-   */
-  public set(
-    key: string,
-    value: string
-  ): void {
-    this.storage.setItem(key, value);
-  }
-
-  /**
-   * Retrieves a string value.
-   */
-  public get(
-    key: string
-  ): string | null {
-    return this.storage.getItem(key);
-  }
-
-  /**
-   * Removes a value by its key.
-   */
-  public remove(
-    key: string
-  ): void {
-    this.storage.removeItem(key);
-  }
-
-  /**
-   * Removes all stored values.
-   */
-  public clear(): void {
-    this.storage.clear();
-  }
-
-  /**
-   * Checks whether a key exists.
-   */
-  public has(
-    key: string
-  ): boolean {
-    return this.storage.getItem(key) !== null;
-  }
-
-  /**
-   * Returns all storage keys.
-   */
-  public keys(): string[] {
-    const keys: string[] = [];
-
-    for (let index = 0; index < this.storage.length; index++) {
-      const key = this.storage.key(index);
-
-      if (key !== null) {
-        keys.push(key);
-      }
-    }
-
-    return keys;
-  }
-
-  /**
-   * Returns the total number of stored items.
-   */
-  public size(): number {
-    return this.storage.length;
   }
 }
