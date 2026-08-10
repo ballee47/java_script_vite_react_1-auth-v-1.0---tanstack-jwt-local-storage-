@@ -1,9 +1,9 @@
-import { BaseStorageAdapter } from "./BaseStorageAdapter";
+import { BaseStorageAdapter } from "../BaseStorageAdapter";
 
 import {
     IKeyValueStore,
     MapKeyValueStore
-} from "../stores";
+} from "../../stores";
 
 export class MemoryStorageAdapter extends BaseStorageAdapter {
 
