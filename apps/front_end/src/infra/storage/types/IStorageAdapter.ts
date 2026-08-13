@@ -1,4 +1,4 @@
-export interface StorageAdapter {
+export interface IStorageAdapter {
   /**
    * Checks whether the storage is available.
    */

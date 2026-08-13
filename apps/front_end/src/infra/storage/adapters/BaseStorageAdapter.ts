@@ -1,7 +1,7 @@
-import { StorageAdapter } from "../types/StorageAdapter";
+import { IStorageAdapter } from "../types/IStorageAdapter";
 
 export abstract class BaseStorageAdapter
-  implements StorageAdapter
+  implements IStorageAdapter
 {
   protected constructor(
     protected readonly namespace: string = ""
