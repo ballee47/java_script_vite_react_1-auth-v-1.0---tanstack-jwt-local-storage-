@@ -1,4 +1,4 @@
-export * from "./IStorageAdapter";
+export * from "../interfaces/IStorageAdapter";
 export * from "./StorageEncryptor";
 export * from "./StorageEvents";
 export * from "./StorageGetOptions";

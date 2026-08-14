@@ -1,4 +1,4 @@
-import { IStorageAdapter } from "../types/IStorageAdapter";
+import { IStorageAdapter } from "../interfaces/IStorageAdapter";
 
 export abstract class BaseStorageAdapter
   implements IStorageAdapter
