@@ -41,7 +41,7 @@ export interface IStorageAdapter {
   /**
    * Returns all stored keys.
    */
-  keys(): string[];
+  keys(): readonly string[];
 
   /**
    * Returns the total number of stored items.

@@ -1,3 +1,4 @@
+import { StorageGetOptions } from "../types";
 import { KeyValidator } from "./KeyValidator";
 
 
@@ -9,7 +10,7 @@ export class StorageGetValidator {
      * Validates a storage get operation.
      */     
 
-    public validate(key : unknown) : void {
+    public validate(key : unknown , options?: StorageGetOptions) : void {
 
      this.KeyValidator.validate(key);
 

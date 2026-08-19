@@ -1,3 +1,4 @@
+import { StorageRemoveOptions } from "../types";
 import { KeyValidator } from "./KeyValidator";
 
 export class StorageRemoveValidator {
@@ -6,7 +7,7 @@ export class StorageRemoveValidator {
     /**
      * Validates a storage remove operation.
      */ 
-    public validate(key: unknown): void {
+    public validate(key: unknown , options?: StorageRemoveOptions): void {
         this.keyValidator.validate(key);
         
     }
