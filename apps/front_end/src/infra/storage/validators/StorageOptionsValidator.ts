@@ -2,7 +2,7 @@
 
 import type { StorageSetOptions } from "../types";
 
-export class StorageOptionsValidator {
+export  class StorageOptionsValidator {
 
     /**
      * Validates storage options.

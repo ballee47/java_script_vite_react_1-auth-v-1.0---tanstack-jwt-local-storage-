@@ -1,6 +1,4 @@
-
-import {StorageService} from "..//services";
-
+import { StorageService } from "../services";
 
 import type {
     StorageGetOptions,
@@ -8,7 +6,7 @@ import type {
     StorageSetOptions,
 } from "../../types";
 
-export class Storage {
+export class StorageFacade {
     constructor(
         private readonly service: StorageService,
     ) {}
@@ -66,14 +64,14 @@ export class Storage {
     }
 
     /**
-     * Number of stored items.
+     * Return the number of stored items.
      */
     public size(): number {
         return this.service.size();
     }
 
     /**
-     * Storage availability.
+     * Check whether the storage is available.
      */
     public isAvailable(): boolean {
         return this.service.isAvailable();
