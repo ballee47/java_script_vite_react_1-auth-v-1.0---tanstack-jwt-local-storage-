@@ -78,9 +78,13 @@ WSGI_APPLICATION = 'bilal_ecommerce_project.wsgi.application'
 
 # Database
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": os.getenv("js_react_vite_1"),
+        "USER": os.getenv("root"),
+        "PASSWORD": os.getenv("8880"),
+        "HOST": os.getenv("DB_HOST", "127.0.0.1"),
+        "PORT": os.getenv("DB_PORT", "3307"),
     }
 }
 
