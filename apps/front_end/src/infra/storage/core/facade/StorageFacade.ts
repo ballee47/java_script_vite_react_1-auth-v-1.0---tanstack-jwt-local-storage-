@@ -1,4 +1,5 @@
 import { StorageService } from "../services";
+import type { IStorageFacade } from "../facade/interfaces/IStorageFacade";
 
 import type {
     StorageGetOptions,
@@ -6,7 +7,7 @@ import type {
     StorageSetOptions,
 } from "../../types";
 
-export class StorageFacade {
+export class StorageFacade implements IStorageFacade {
     constructor(
         private readonly service: StorageService,
     ) {}
