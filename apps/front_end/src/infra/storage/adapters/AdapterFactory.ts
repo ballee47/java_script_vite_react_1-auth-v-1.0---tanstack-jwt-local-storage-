@@ -1,8 +1,6 @@
 import type { IStorageAdapter } from "../interfaces/IStorageAdapter";
-
 import type { StorageFactoryOptions } from "../types";
 import { StorageType } from "../types";
-
 import { LocalStorageAdapter } from "./LocalStorageAdapter/LocalStorageAdapter";
 import { SessionStorageAdapter } from "./SessionStorageAdapter";
 import { MemoryStorageAdapter } from "./MemoryStorageAdapter/MemoryStorageAdapter";
