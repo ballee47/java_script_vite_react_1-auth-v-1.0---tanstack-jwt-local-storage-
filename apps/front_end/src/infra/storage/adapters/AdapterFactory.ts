@@ -2,9 +2,9 @@ import type { IStorageAdapter } from "../interfaces/IStorageAdapter";
 import type { StorageFactoryOptions } from "../types";
 import { StorageType } from "../types";
 import { LocalStorageAdapter } from "./LocalStorageAdapter/LocalStorageAdapter";
-import { SessionStorageAdapter } from "./SessionStorageAdapter";
+import { SessionStorageAdapter } from "./SessionStorageAdapter/SessionStorageAdapter";
 import { MemoryStorageAdapter } from "./MemoryStorageAdapter/MemoryStorageAdapter";
-import { CookieStorageAdapter } from "./CookieStorageAdapter";
+import { CookieStorageAdapter } from "./cookie/CookieStorageAdapter";
 
 export class AdapterFactory {
     private constructor() {}
@@ -21,7 +21,7 @@ export class AdapterFactory {
             case StorageType.SESSION:
                 return new SessionStorageAdapter(
                     options.namespace,
-                );
+                ) as unknown as IStorageAdapter;
 
             case StorageType.MEMORY:
                 return new MemoryStorageAdapter(

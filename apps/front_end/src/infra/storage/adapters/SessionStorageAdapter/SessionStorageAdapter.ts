@@ -1,4 +1,4 @@
-import { BrowserStorageAdapter } from "./BrowserStorageAdapter";
+import { BrowserStorageAdapter } from "../BrowserStorageAdapter";
 
 export class SessionStorageAdapter extends BrowserStorageAdapter {
   constructor(namespace = "") {

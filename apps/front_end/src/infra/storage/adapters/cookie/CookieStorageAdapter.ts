@@ -1,9 +1,9 @@
-import { BaseStorageAdapter } from "./BaseStorageAdapter";
-import { CookieManager } from "./cookie/CookieManager";
-import { CookieParser } from "./cookie/CookieParser";
-import { CookieSerializer } from "./cookie/CookieSerializer";
-import { CookieOptions } from "./cookie/CookieOptions";
-import { ICookieManager } from "./cookie/interfaces/ICookieManager";
+import { BaseStorageAdapter } from "../BaseStorageAdapter";
+import { CookieManager } from "./CookieManager";
+import { CookieParser } from "./CookieParser";
+import { CookieSerializer } from "./CookieSerializer";
+import { CookieOptions } from "./CookieOptions";
+import { ICookieManager } from "./interfaces/ICookieManager";
 
 export class CookieStorageAdapter
     extends BaseStorageAdapter
