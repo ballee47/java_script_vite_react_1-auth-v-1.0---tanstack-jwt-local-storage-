@@ -1,7 +1,7 @@
 import { KeyValidator } from "./KeyValidator";
 import { ValueValidator } from "./ValueValidator";
-import { StorageOptionsValidator } from "./StorageOptionsValidator";
-import type { StorageSetOptions } from "../types";
+import { StorageOptionsValidator } from "../StorageOptionsValidator";
+import type { StorageSetOptions } from "../../types";
 
 export class StorageSetValidator {
     constructor(

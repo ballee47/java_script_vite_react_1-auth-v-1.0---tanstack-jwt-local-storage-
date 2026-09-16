@@ -1,15 +1,14 @@
-export * from "./DefaultStorageValidator";
+export * from "./core/DefaultStorageValidator";
+export * from "./core/SchemaValidator";
 
-export * from "./KeyValidator";
+export * from "./primitives/KeyValidator";
+export * from "./primitives/ValueValidator";
 
-export * from "./ValueValidator";
 
-export * from "./SchemaValidator";
+export * from "./options/StorageOptionsValidator";
 
-export * from "./StorageOptionsValidator";
+export * from "./operations/StorageSetValidator";
 
-export * from "./StorageSetValidator";
+export * from "./operations/StorageGetValidator";
 
-export * from "./StorageGetValidator";
-
-export * from "./StorageRemoveValidator";
+export * from "./operations/StorageRemoveValidator";

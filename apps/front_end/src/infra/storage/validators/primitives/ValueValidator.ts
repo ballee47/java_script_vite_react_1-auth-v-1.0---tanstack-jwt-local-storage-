@@ -1,4 +1,4 @@
-import { DefaultStorageValidator } from "./DefaultStorageValidator";
+import { DefaultStorageValidator } from "./core/DefaultStorageValidator";
 
 export class ValueValidator extends DefaultStorageValidator {
 

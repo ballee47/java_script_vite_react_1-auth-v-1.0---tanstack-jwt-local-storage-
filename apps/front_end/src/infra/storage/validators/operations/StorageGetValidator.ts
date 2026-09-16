@@ -1,4 +1,4 @@
-import { StorageGetOptions } from "../types";
+import { StorageGetOptions } from "../../types";
 import { KeyValidator } from "./KeyValidator";
 
 

@@ -1,4 +1,4 @@
-import { StorageRemoveOptions } from "../types";
+import { StorageRemoveOptions } from "../../types";
 import { KeyValidator } from "./KeyValidator";
 
 export class StorageRemoveValidator {
