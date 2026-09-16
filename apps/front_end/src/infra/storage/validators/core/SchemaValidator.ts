@@ -1,6 +1,6 @@
-import { StorageSchema } from "../types/StorageSchema";
-import { KeyValidator } from "./KeyValidator";
-import { ValueValidator } from "./ValueValidator";
+import { StorageSchema } from "../../types";
+import { KeyValidator } from "../primitives/KeyValidator";
+import { ValueValidator } from "../primitives/ValueValidator";
 
 export class SchemaValidator {
   constructor(

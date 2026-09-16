@@ -1,6 +1,6 @@
 // validators/StorageOptionsValidator.ts
 
-import type { StorageSetOptions } from "../types";
+import type { StorageSetOptions } from "../../types";
 
 export  class StorageOptionsValidator {
 

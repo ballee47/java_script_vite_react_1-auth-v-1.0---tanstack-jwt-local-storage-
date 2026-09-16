@@ -1,6 +1,5 @@
 import { StorageGetOptions } from "../../types";
-import { KeyValidator } from "./KeyValidator";
-
+import { KeyValidator } from "../primitives/KeyValidator";
 
 
 export class StorageGetValidator {

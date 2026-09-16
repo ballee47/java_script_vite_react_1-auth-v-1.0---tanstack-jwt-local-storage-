@@ -1,6 +1,6 @@
-import { KeyValidator } from "./KeyValidator";
-import { ValueValidator } from "./ValueValidator";
-import { StorageOptionsValidator } from "../StorageOptionsValidator";
+import { KeyValidator } from "../primitives/KeyValidator";
+import { ValueValidator } from "../primitives/ValueValidator";
+import { StorageOptionsValidator } from "../options/StorageOptionsValidator";
 import type { StorageSetOptions } from "../../types";
 
 export class StorageSetValidator {

@@ -1,5 +1,5 @@
-import { DefaultStorageValidator } from "./core/DefaultStorageValidator";
-import { StorageLimits } from "../constants";
+import { DefaultStorageValidator } from "../core/DefaultStorageValidator";
+import { StorageLimits } from "../../constants";
 
 export class KeyValidator extends DefaultStorageValidator {
 

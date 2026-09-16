@@ -1,5 +1,5 @@
 import { StorageRemoveOptions } from "../../types";
-import { KeyValidator } from "./KeyValidator";
+import { KeyValidator } from "../primitives/KeyValidator";
 
 export class StorageRemoveValidator {
     constructor(private readonly keyValidator: KeyValidator) {}
