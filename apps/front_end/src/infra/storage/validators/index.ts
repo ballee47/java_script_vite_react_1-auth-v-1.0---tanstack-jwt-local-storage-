@@ -1,5 +1,5 @@
 export * from "./core/DefaultStorageValidator";
-export * from "./core/SchemaValidator";
+export * from "./core/StorageSchemaValidator";
 
 export * from "./primitives/KeyValidator";
 export * from "./primitives/ValueValidator";

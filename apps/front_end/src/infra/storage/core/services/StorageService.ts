@@ -7,9 +7,12 @@ import type { ISerializer } from "../../serializers/interfaces/ISerializer";
 import {
     StorageGetValidator,
     StorageRemoveValidator,
+    StorageSchemaValidator,
     StorageSetValidator,
 } from "../../validators";
 
+import { StorageRecordFactory } from "../factories/StorageRecordFactory";
+import type { StorageSchema } from "../../schemas/StorageSchema";
 import type {
     StorageGetOptions,
     StorageRemoveOptions,
@@ -21,9 +24,13 @@ export class StorageService implements IStorageService {
     constructor(
         private readonly adapter: IStorageAdapter,
         private readonly serializer: ISerializer,
+
         private readonly setValidator: StorageSetValidator,
         private readonly getValidator: StorageGetValidator,
         private readonly removeValidator: StorageRemoveValidator,
+
+        private readonly recordFactory: StorageRecordFactory,
+        private readonly schemaValidator: StorageSchemaValidator,
     ) {}
 
     /**
@@ -35,14 +42,29 @@ export class StorageService implements IStorageService {
         options?: StorageSetOptions,
     ): void {
 
+        // 1. Validate public operation input.
         this.setValidator.validate(
             key,
             value,
             options,
         );
 
-        const serializedValue = this.serializer.serialize(value);
+        // 2. Create the internal storage record.
+        const schema = this.recordFactory.create(
+            key,
+            value,
+            options,
+        );
 
+        // 3. Validate the complete internal record.
+        this.schemaValidator.validate(schema);
+
+        // 4. Serialize the complete storage record.
+        const serializedValue = this.serializer.serialize(
+            schema,
+        );
+
+        // 5. Persist the serialized record.
         this.adapter.set(
             key,
             serializedValue,
@@ -53,23 +75,30 @@ export class StorageService implements IStorageService {
      * Retrieve a value.
      */
     public get<T = unknown>(
-        key: string,
-        options?: StorageGetOptions,
-    ): T | null {
+    key: string,
+    options?: StorageGetOptions,
+): T | null {
 
-        this.getValidator.validate(
-            key,
-            options,
+    this.getValidator.validate(
+        key,
+        options,
+    );
+
+    const serializedValue = this.adapter.get(key);
+
+    if (serializedValue === null) {
+        return null;
+    }
+
+    const schema =
+        this.serializer.deserialize<StorageSchema<T>>(
+            serializedValue,
         );
 
-        const value = this.adapter.get(key);
+    this.schemaValidator.validate(schema);
 
-        if (value === null) {
-            return null;
-        }
-
-        return this.serializer.deserialize<T>(value);
-    }
+    return schema.value;
+}
 
     /**
      * Check whether a key exists.
@@ -126,5 +155,4 @@ export class StorageService implements IStorageService {
     public isAvailable(): boolean {
         return this.adapter.isAvailable();
     }
-
 }
