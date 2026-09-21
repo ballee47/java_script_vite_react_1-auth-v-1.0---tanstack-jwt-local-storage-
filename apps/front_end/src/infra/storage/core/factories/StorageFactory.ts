@@ -18,6 +18,10 @@ import { StorageFacade } from "../facade/StorageFacade";
 
 import type { StorageFactoryOptions } from "../../types";
 
+import { StorageRecordFactory } from "./StorageRecordFactory";
+import { StorageSchemaValidator } from "../../validators/core/StorageSchemaValidator";
+
+
 export class StorageFactory {
     private constructor() {}
 
@@ -35,23 +39,33 @@ export class StorageFactory {
         const keyValidator = new KeyValidator();
         const valueValidator = new ValueValidator();
         const optionsValidator = new StorageOptionsValidator();
-
+        const schemaValidator = new StorageSchemaValidator(
+            keyValidator,
+            valueValidator,
+        );
+        
+            
+      
         // 4. Create the set validator
         const setValidator = new StorageSetValidator(
             keyValidator,
             valueValidator,
             optionsValidator,
+            
         );
 
         // 5. Create the get validator
         const getValidator = new StorageGetValidator(
             keyValidator,
+            
         );
 
         // 6. Create the remove validator
         const removeValidator = new StorageRemoveValidator(
             keyValidator,
+              
         );
+        const recordFactory = new StorageRecordFactory();
 
         // 7. Create the storage service
         const service = new StorageService(
@@ -60,6 +74,8 @@ export class StorageFactory {
             setValidator,
             getValidator,
             removeValidator,
+            recordFactory,
+            schemaValidator,
         );
 
         // 8. Create the public facade
