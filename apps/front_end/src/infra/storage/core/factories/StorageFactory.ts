@@ -28,21 +28,25 @@ export class StorageFactory {
     public static create(
         options: StorageFactoryOptions,
     ): StorageFacade {
-
+        
         // 1. Create the storage adapter
         const adapter = AdapterFactory.create(options);
-
+        
         // 2. Create the serializer
         const serializer = new JsonSerializer();
-
+        
         // 3. Create shared validator dependencies
         const keyValidator = new KeyValidator();
         const valueValidator = new ValueValidator();
         const optionsValidator = new StorageOptionsValidator();
+        // 4. Create the schema validator
+
         const schemaValidator = new StorageSchemaValidator(
             keyValidator,
             valueValidator,
         );
+        const recordFactory = new StorageRecordFactory();
+        
         
             
       
@@ -65,7 +69,6 @@ export class StorageFactory {
             keyValidator,
               
         );
-        const recordFactory = new StorageRecordFactory();
 
         // 7. Create the storage service
         const service = new StorageService(
