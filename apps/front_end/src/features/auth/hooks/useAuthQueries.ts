@@ -1,14 +1,28 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { loginApi, fetchMeApi } from "../api/login.api";
+
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+
+import {
+  loginApi,
+  fetchMeApi,
+} from "../api/auth.api";
+
 import { logout as logoutApi } from "@/infra/http/auth/logout";
+
 import { queryKeys } from "@/query/keys";
-import { clearStorage } from "@/infra/storage1";
 
-/* =====================================================
-   LOGIN
-===================================================== */
+export function useMe() {
+  return useQuery({
+    queryKey: queryKeys.me,
+    queryFn: fetchMeApi,
+    retry: false,
+  });
+}
 
-export const useLogin = () => {
+export function useLogin() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -18,54 +32,21 @@ export const useLogin = () => {
       await queryClient.invalidateQueries({
         queryKey: queryKeys.me,
       });
-
-      await queryClient.refetchQueries({
-        queryKey: queryKeys.me,
-      });
     },
   });
-};
+}
 
-/* =====================================================
-   CURRENT USER
-===================================================== */
-
-export const useMe = () => {
-  return useQuery({
-    queryKey: queryKeys.me,
-    queryFn: fetchMeApi,
-
-    retry: false,
-    staleTime: 0,
-    gcTime: 0,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    refetchOnMount: true,
-  });
-};
-
-/* =====================================================
-   LOGOUT
-===================================================== */
-
-export const useLogout = () => {
+export function useLogout() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: logoutApi,
 
-    onSettled: () => {
-      clearStorage();
-
-      queryClient.setQueryData(
-        queryKeys.me,
-        null
-      );
-
+    onSuccess: () => {
       queryClient.removeQueries({
         queryKey: queryKeys.me,
-        exact: true,
       });
     },
   });
-};
+}
+

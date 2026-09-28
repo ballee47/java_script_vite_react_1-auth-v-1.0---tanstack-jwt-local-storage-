@@ -1,15 +1,15 @@
-// src/features/auth/context/AuthContext.ts
 
 import { createContext } from "react";
-import type { MeResponse } from "../api/login.api";
+import { User } from "../types/auth.types";
 
-export type AuthContextType = {
-  user: MeResponse | null;
+
+export interface AuthContextValue {
+  user: User | null;
   isAuthenticated: boolean;
-  isLoadingAuth: boolean;
-};
+  isLoading: boolean;
+}
 
-export const AuthContext =
-  createContext<AuthContextType | undefined>(
-    undefined
-  );
+export const AuthContext = createContext<AuthContextValue | undefined>(
+  undefined,
+);
+

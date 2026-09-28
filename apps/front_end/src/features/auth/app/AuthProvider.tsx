@@ -1,34 +1,17 @@
-import { useEffect } from "react";
-import { AuthContext } from "../context/AuthContext";
-import { useMe } from "../hooks/useAuthQueries";
-import { axiosInstance } from "@/infra/http/client/axiosInstance";
-import { AUTH_ENDPOINTS } from "@/infra/http/api/endpoints";
 
-interface Props {
-  children: React.ReactNode;
+import { createContext } from "react";
+
+import type { useMe } from "../hooks/useAuthQueries";
+
+type User = NonNullable<ReturnType<typeof useMe>["data"]>;
+
+export interface AuthContextValue {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoadingAuth: boolean;
 }
 
-export function AuthProvider({ children }: Props) {
-  const {
-    data: user,
-    isLoading,
-  } = useMe();
+export const AuthContext = createContext<AuthContextValue | undefined>(
+  undefined,
+);
 
-  useEffect(() => {
-    axiosInstance
-      .get(AUTH_ENDPOINTS.CSRF)
-      .catch(() => {});
-  }, []);
-
-  return (
-    <AuthContext.Provider
-      value={{
-        user: user ?? null,
-        isAuthenticated: Boolean(user),
-        isLoadingAuth: isLoading,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
-}
