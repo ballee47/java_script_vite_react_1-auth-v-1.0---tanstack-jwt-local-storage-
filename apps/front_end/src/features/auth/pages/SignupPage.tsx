@@ -1,7 +1,7 @@
 // src/features/auth/pages/SignupPage.tsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { signupApi } from "../api/login.api";       // ✅ use api file
+import { signupApi } from "../api/auth.api"; // ✅ import signupApi
 import { useLogin } from "../hooks/useAuthQueries"; // ✅ use hook directly
 
 export default function SignupPage() {
