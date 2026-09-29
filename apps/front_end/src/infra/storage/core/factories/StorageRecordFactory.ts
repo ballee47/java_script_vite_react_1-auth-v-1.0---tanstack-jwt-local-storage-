@@ -8,9 +8,10 @@ export class StorageRecordFactory {
     public create<T>(
         key: string,
         value: T,
-        options?: StorageSetOptions,
+        _options?: StorageSetOptions,
     ): StorageSchema<T> {
 
+        void _options;
         const now = Date.now();
 
         return {

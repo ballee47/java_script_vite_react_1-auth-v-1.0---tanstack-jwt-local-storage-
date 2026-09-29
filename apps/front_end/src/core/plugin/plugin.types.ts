@@ -1,15 +1,15 @@
-import React from "react"
+import type { ComponentType, ReactNode } from "react";
 
 export type AppPlugin = {
   name: string
 
-  routes?: () => React.ReactNode
+  routes?: () => ReactNode
 
-  providers?: React.FC<{ children: React.ReactNode }>
+  providers?: ComponentType<{ children: ReactNode }>
 
- slots?: {
-  hero?: () => Promise<any>
-}
+  slots?: {
+    hero?: () => Promise<unknown>
+  }
 
   setup?: () => void
 }

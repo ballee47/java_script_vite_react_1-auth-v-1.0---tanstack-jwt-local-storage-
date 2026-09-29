@@ -3,11 +3,13 @@
 import { apiGateway } from "@/infra/http/gateway/apiGateway";
 import { PRODUCT_ENDPOINTS } from "@/infra/http/api/endpoints/product";
 
-import {
+import type {
   Product,
   CreateProductPayload,
   UpdateProductPayload,
 } from "../types";
+
+export type { Product } from "../types";
 
 /* ─────────────────────────────────────────
    API FUNCTIONS

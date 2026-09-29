@@ -9,9 +9,10 @@ export class StorageGetValidator {
      * Validates a storage get operation.
      */     
 
-    public validate(key : unknown , options?: StorageGetOptions) : void {
+    public validate(key : unknown , _options?: StorageGetOptions) : void {
 
      this.KeyValidator.validate(key);
+     void _options;
 
     }
 

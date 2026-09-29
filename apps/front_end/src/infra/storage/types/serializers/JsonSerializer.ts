@@ -1,6 +1,6 @@
-import { StorageSerializer } from "../StorageSerializer";
+import type { ISerializer } from "../../serializers/interfaces/ISerializer";
 
-export class JsonSerializer implements StorageSerializer {
+export class JsonSerializer implements ISerializer {
   serialize<T>(value: T): string {
     return JSON.stringify(value);
   }

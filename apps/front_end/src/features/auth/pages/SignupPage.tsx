@@ -1,5 +1,6 @@
 // src/features/auth/pages/SignupPage.tsx
 import { useState } from "react";
+import { isAxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
 import { signupApi } from "../api/auth.api"; // ✅ import signupApi
 import { useLogin } from "../hooks/useAuthQueries"; // ✅ use hook directly
@@ -33,9 +34,15 @@ export default function SignupPage() {
       // ✅ step 4 — redirect to dashboard
       navigate("/dashboard", { replace: true });
 
-    } catch (err: any) {
-      console.error("FULL ERROR:", err?.response?.data);
-      const message = err?.response?.data?.message || "Signup failed. Try again.";
+    } catch (error: unknown) {
+      console.error("FULL ERROR:", error);
+      const responseData = isAxiosError<{ detail?: string; message?: string }>(error)
+        ? error.response?.data
+        : undefined;
+      const message =
+        responseData?.detail ??
+        responseData?.message ??
+        "Signup failed. Try again.";
       setError(message);
     } finally {
       setLoading(false);

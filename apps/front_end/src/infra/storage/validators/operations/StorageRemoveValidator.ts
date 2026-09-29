@@ -7,8 +7,9 @@ export class StorageRemoveValidator {
     /**
      * Validates a storage remove operation.
      */ 
-    public validate(key: unknown , options?: StorageRemoveOptions): void {
+    public validate(key: unknown , _options?: StorageRemoveOptions): void {
         this.keyValidator.validate(key);
+        void _options;
         
     }
 

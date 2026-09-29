@@ -29,7 +29,7 @@ export const loginApi = (
 export type MeResponse = {
   id: number;
   email: string;
-  name: string;
+  username: string;
 };
 
 export const fetchMeApi = (): Promise<MeResponse> => {

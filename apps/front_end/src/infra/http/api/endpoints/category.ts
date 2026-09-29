@@ -1,7 +1,7 @@
 export const CATEGORY_ENDPOINTS = {
-  LIST: "/categories",
+  LIST: "/categories/",
 
-  CREATE: "/categories",
+  CREATE: "/categories/",
 
-  BY_ID: (id: number | string) => `/categories/${id}`,
+  BY_ID: (id: number | string) => `/categories/${id}/`,
 } as const;
