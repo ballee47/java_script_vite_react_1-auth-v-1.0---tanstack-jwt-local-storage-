@@ -8,6 +8,7 @@ import { HomePage } from "@/features/home";
 import LoginPage from "@/features/auth/pages/LoginPage";
 import SignupPage from "@/features/auth/pages/SignupPage";
 import ProductPage from "@/features/products/pages/ProductPage";
+import CategoriesPage from "@/features/categories";
 import DashboardPage from "@/features/dashboard/pages/DashboardPage";
 
 export function AppRoutes() {
@@ -20,6 +21,7 @@ export function AppRoutes() {
       <Route element={<MainLayout />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/products" element={<ProductPage />} />
+        <Route path="/categories" element={<CategoriesPage />} />
       </Route>
 
       {/* ─────────────────────────────────────

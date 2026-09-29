@@ -1,11 +1,13 @@
-// src/guards/GuestRoute.tsx
 import { Navigate, Outlet } from "react-router-dom";
-export default function GuestRoute() {
 
-  // if already logged in — redirect away from login/signup
-  if (localStorage.getItem("access_token")) {
-    return <Navigate to="/" replace />;
+import { useAuth } from "@/features/auth/hooks/useAuth";
+
+export default function GuestRoute() {
+  const { isAuthenticated, isLoadingAuth } = useAuth();
+
+  if (isLoadingAuth) {
+    return null;
   }
 
-  return <Outlet />;
+  return isAuthenticated ? <Navigate to="/" replace /> : <Outlet />;
 }

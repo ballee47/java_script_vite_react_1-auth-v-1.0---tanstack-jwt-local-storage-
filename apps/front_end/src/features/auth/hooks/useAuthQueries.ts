@@ -9,6 +9,7 @@ import {
   loginApi,
   fetchMeApi,
 } from "../api/auth.api";
+import type { MeResponse } from "../api/auth.api";
 
 import { logout as logoutApi } from "@/infra/http/auth/logout";
 
@@ -43,9 +44,10 @@ export function useLogout() {
     mutationFn: logoutApi,
 
     onSuccess: () => {
-      queryClient.removeQueries({
-        queryKey: queryKeys.me,
-      });
+      queryClient.setQueryData<MeResponse | null>(
+        queryKeys.me,
+        null,
+      );
     },
   });
 }

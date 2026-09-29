@@ -126,6 +126,10 @@ export default function Navbar({ setOpen }: NavbarProps) {
           Products
         </NavLink>
 
+        <NavLink to="/categories" className={linkClass}>
+          Categories
+        </NavLink>
+
         <form
           onSubmit={handleSearch}
           className="ml-4"
