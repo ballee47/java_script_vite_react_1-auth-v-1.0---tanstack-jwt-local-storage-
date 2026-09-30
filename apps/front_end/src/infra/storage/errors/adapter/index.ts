@@ -1,0 +1,1 @@
+export { StorageAdapterError } from "./StorageAdapterError";
