@@ -1,3 +1,6 @@
+// making the interfac above here not in the base folder it is titly copuled to the stroage error if the storageError will used in multiple places then we should make the interface in a separate file and import it here
+ 
+
 export interface StorageErrorOptions {
   code: string;
   operation?: string;
