@@ -4,6 +4,7 @@ export class StorageReadError extends StorageAdapterError {
   constructor(
     message = "Storage read operation failed",
     options?: {
+      operation?: string;
       cause?: unknown;
       metadata?: Record<string, unknown>;
     }

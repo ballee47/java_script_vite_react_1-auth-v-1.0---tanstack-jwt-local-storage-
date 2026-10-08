@@ -4,6 +4,7 @@ export class StorageRemoveError extends StorageAdapterError {
   constructor(
     message = "Storage remove operation failed",
     options?: {
+      operation?: string;
       cause?: unknown;
       metadata?: Record<string, unknown>;
     }

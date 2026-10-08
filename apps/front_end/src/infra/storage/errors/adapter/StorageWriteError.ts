@@ -5,6 +5,7 @@ export class StorageWriteError extends StorageAdapterError {
     message = "Storage write operation failed",
     options?: {
       cause?: unknown;
+      operation?: string;
       metadata?: Record<string, unknown>;
     }
   ) {
