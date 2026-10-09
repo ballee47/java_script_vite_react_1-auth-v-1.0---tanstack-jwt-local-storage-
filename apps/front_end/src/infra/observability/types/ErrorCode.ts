@@ -1,38 +1,24 @@
 
-/**
- * Standardized application error codes.
- *
- * These codes identify error categories consistently
- * across the application's modules.
- */
 export const ErrorCode = {
-  // General errors
   UNKNOWN_ERROR: "UNKNOWN_ERROR",
   INTERNAL_ERROR: "INTERNAL_ERROR",
 
-  // Input and configuration errors
   VALIDATION_ERROR: "VALIDATION_ERROR",
   CONFIGURATION_ERROR: "CONFIGURATION_ERROR",
 
-  // Infrastructure errors
   STORAGE_ERROR: "STORAGE_ERROR",
   NETWORK_ERROR: "NETWORK_ERROR",
   TIMEOUT_ERROR: "TIMEOUT_ERROR",
 
-  // Access and resource errors
   AUTHENTICATION_ERROR: "AUTHENTICATION_ERROR",
   AUTHORIZATION_ERROR: "AUTHORIZATION_ERROR",
+
   NOT_FOUND: "NOT_FOUND",
   CONFLICT: "CONFLICT",
   RATE_LIMITED: "RATE_LIMITED",
-
-  // Operation lifecycle
   CANCELLED: "CANCELLED",
 } as const;
 
-/**
- * Union of all supported error-code values.
- */
 export type ErrorCode =
   (typeof ErrorCode)[keyof typeof ErrorCode];
 
