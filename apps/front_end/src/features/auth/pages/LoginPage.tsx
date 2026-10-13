@@ -21,7 +21,6 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      console.log("Login attempt:", { username });
 
       // Login and set HTTP-only cookie
       await loginMutate({
@@ -34,7 +33,6 @@ export default function LoginPage() {
         queryKey: ["me"],
       });
 
-      console.log("AUTH READY");
 
       navigate("/dashboard", {
         replace: true,
