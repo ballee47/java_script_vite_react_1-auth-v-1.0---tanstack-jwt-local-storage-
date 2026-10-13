@@ -3,7 +3,7 @@ import type {
   SpanContext,
   SpanOptions,
   SpanSnapshot,
-} from "./TraceTypes";
+} from "../types/TraceTypes";
 
 import type { ISpan } from "./ISpan";
 

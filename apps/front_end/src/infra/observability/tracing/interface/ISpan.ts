@@ -4,7 +4,7 @@ import type {
   SpanEvent,
   SpanStatus,
   SpanAttributes,
-} from "./TraceTypes";
+} from "../types/TraceTypes";
 
 export interface ISpan {
   /**
@@ -61,5 +61,5 @@ export interface ISpan {
   /**
    * Returns an immutable snapshot of the span's current state.
    */
-  toSnapshot(): import("./TraceTypes").SpanSnapshot;
+  toSnapshot(): import("../types/TraceTypes").SpanSnapshot;
 }

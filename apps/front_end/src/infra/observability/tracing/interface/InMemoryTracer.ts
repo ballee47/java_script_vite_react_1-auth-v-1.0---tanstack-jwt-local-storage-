@@ -2,7 +2,7 @@
 import type { ITracer } from "./ITracer";
 import type { ISpan } from "./ISpan";
 
-import { Span } from "./Span";
+import { Span } from "../Span";
 
 import type {
   SpanContext,
@@ -10,7 +10,7 @@ import type {
   SpanSnapshot,
   TraceId,
   SpanId,
-} from "./TraceTypes";
+} from "../types/TraceTypes";
 
 export interface InMemoryTracerOptions {
   /**

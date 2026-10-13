@@ -1,5 +1,5 @@
 
-import type { ISpan } from "./ISpan";
+import type { ISpan } from "./interface/ISpan";
 
 import type {
   AttributeValue,
@@ -10,7 +10,7 @@ import type {
   SpanKind,
   SpanSnapshot,
   SpanStatus,
-} from "./TraceTypes";
+} from "./types/TraceTypes";
 
 export interface SpanImplementationOptions {
   readonly kind?: SpanKind;

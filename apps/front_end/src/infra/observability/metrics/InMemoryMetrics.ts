@@ -1,5 +1,5 @@
 
-import type { IMetrics } from "./IMetrics";
+import type { IMetrics } from "./interfaces/IMetrics";
 import type { Counter } from "./Counter";
 import type { Gauge } from "./Gauge";
 import type { Histogram } from "./Histogram";
@@ -13,7 +13,7 @@ import type {
   MetricType,
   MetricsOptions,
   MetricsSnapshot,
-} from "./MetricTypes";
+} from "./types/MetricTypes";
 
 const DEFAULT_MAX_SERIES = 1_000;
 

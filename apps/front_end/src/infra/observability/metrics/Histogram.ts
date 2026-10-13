@@ -1,7 +1,7 @@
 
 import type {
   MetricLabels,
-} from "./MetricTypes";
+} from "./types/MetricTypes";
 
 export interface Histogram {
   observe(

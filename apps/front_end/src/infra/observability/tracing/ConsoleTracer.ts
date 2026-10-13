@@ -1,6 +1,6 @@
 
-import type { ITracer } from "./ITracer";
-import type { ISpan } from "./ISpan";
+import type { ITracer } from "./interface/ITracer";
+import type { ISpan } from "./interface/ISpan";
 
 import { Span } from "./Span";
 
@@ -10,7 +10,7 @@ import type {
   SpanSnapshot,
   TraceId,
   SpanId,
-} from "./TraceTypes";
+} from "./types/TraceTypes";
 
 export interface ConsoleTracerOptions {
   readonly logFinishedSpans?: boolean;
