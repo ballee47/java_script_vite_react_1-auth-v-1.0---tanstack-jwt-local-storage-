@@ -6,8 +6,8 @@ import { env } from "@/config/env";
 type Product = {
   id: number;
   name: string;
-  price: number;
-  image: string;
+  price: string | number;
+  image?: string | null;
 };
 
 // ✅ local fallback — no external request, never fails

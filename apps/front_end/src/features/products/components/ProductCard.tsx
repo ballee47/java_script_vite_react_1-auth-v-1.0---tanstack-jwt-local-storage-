@@ -15,7 +15,7 @@ export default function ProductCard({
       className="cursor-pointer bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-4 hover:scale-105 transition"
     >
       <img
-        src={product.image}
+        src={product.image ?? undefined}
         alt={product.name}
         className="w-full h-40 object-cover rounded-xl"
       />

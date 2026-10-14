@@ -8,5 +8,7 @@ export const AUTH_ROUTES = [
   "/login",
   "/logout",
   "/refresh",
+  "/me",
+  "/csrf",
   "/token",
 ] as const;

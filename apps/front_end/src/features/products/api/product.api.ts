@@ -11,14 +11,36 @@ import type {
 
 export type { Product } from "../types";
 
+type ProductListResponse =
+  | Product[]
+  | { data?: Product[]; results?: Product[] };
+
+function extractProducts(response: ProductListResponse): Product[] {
+  if (Array.isArray(response)) {
+    return response;
+  }
+
+  if (Array.isArray(response.results)) {
+    return response.results;
+  }
+
+  if (Array.isArray(response.data)) {
+    return response.data;
+  }
+
+  return [];
+}
+
 /* ─────────────────────────────────────────
    API FUNCTIONS
    ───────────────────────────────────────── */
 
 export const getProductsApi = async (): Promise<Product[]> => {
-  return apiGateway.get<Product[]>(
+  const response = await apiGateway.get<ProductListResponse>(
     PRODUCT_ENDPOINTS.LIST
   );
+
+  return extractProducts(response);
 };
 
 export const getProductByIdApi = async (

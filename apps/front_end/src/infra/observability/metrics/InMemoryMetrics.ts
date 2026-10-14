@@ -184,6 +184,36 @@ export class InMemoryMetrics implements IMetrics {
     };
   }
 
+  /**
+   * Increment a named counter.
+   *
+   * Creates the counter on first use and reuses its registration
+   * on subsequent calls.
+   */
+  increment(
+    name: MetricName,
+    labels: MetricLabels = {},
+    value = 1,
+  ): void {
+    const counter = this.createCounter({ name });
+    counter.increment(value, labels);
+  }
+
+  /**
+   * Record a numeric observation in a named histogram.
+   *
+   * Creates the histogram on first use and reuses its registration
+   * on subsequent calls.
+   */
+  record(
+    name: MetricName,
+    value: number,
+    labels: MetricLabels = {},
+  ): void {
+    const histogram = this.createHistogram({ name });
+    histogram.observe(value, labels);
+  }
+
   getSnapshot(): MetricsSnapshot {
     const metrics: MetricSnapshot[] = [];
 

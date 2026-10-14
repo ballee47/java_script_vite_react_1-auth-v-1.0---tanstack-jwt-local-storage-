@@ -23,7 +23,7 @@ export default function ProductDetails({
       <div className="grid md:grid-cols-2 gap-10">
 
         <img
-          src={product.image}
+          src={product.image ?? undefined}
           alt={product.name}
           className="w-full rounded-2xl"
         />
