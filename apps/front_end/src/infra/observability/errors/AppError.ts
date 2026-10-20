@@ -1,5 +1,5 @@
 
-import type { ErrorCode } from "../types/ErrorCode";
+import type { ErrorCode } from "./ErrorCode";
 import type { ErrorContext } from "../types/ErrorContext";
 
 export interface AppErrorOptions {

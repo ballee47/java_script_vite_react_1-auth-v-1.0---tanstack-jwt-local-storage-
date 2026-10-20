@@ -1,5 +1,5 @@
 
-import { ErrorCode } from "../types/ErrorCode";
+import { ErrorCode } from "./ErrorCode";
 import type { ErrorContext } from "../types/ErrorContext";
 import type { NormalizedError } from "../types/NormalizedError";
 import { AppError } from "./AppError";

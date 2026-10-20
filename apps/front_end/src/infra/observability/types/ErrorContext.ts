@@ -2,25 +2,37 @@
 export interface ErrorContext {
   /**
    * Name of the module where the error occurred.
-   * Example: "storage", "http", "authentication"
+   * Examples: "storage", "http", "authentication"
    */
-  module?: string;
+  readonly module?: string;
 
   /**
    * Name of the operation that failed.
-   * Example: "getItem", "sendRequest"
+   * Examples: "getItem", "sendRequest"
    */
-  operation?: string;
+  readonly operation?: string;
 
   /**
-   * Unique identifier for the current request or operation.
+   * Name of the service where the error occurred.
+   * Examples: "user-service", "payment-service"
    */
-  correlationId?: string;
+  readonly service?: string;
 
   /**
-   * Additional diagnostic information.
-   * Do not include passwords, tokens, or other sensitive data.
+   * Identifier used to correlate related requests or operations.
    */
-  metadata?: Record<string, unknown>;
+  readonly correlationId?: string;
+
+  /**
+   * Distributed tracing identifiers.
+   * Prefer obtaining these from the active tracing context when possible.
+   */
+  readonly traceId?: string;
+  readonly spanId?: string;
+
+  /**
+   * Additional diagnostic information relevant to the error.
+   * Never include passwords, access tokens, secrets, or sensitive personal data.
+   */
+  readonly metadata?: Readonly<Record<string, unknown>>;
 }
-
