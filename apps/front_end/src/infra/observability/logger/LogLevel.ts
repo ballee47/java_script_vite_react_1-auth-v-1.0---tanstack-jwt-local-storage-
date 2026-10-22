@@ -8,3 +8,10 @@ export const LogLevel = {
 
 export type LogLevel =
   (typeof LogLevel)[keyof typeof LogLevel];
+
+export const LOG_LEVEL_PRIORITY: Record<LogLevel, number> = {
+  debug: 10,
+  info: 20,
+  warn: 30,
+  error: 40,
+};
