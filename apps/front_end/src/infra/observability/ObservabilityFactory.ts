@@ -2,6 +2,7 @@
 import { ConsoleLogger } from "./logger/ConsoleLogger";
 import { InMemoryMetrics } from "./metrics/InMemoryMetrics";
 import { ConsoleTracer } from "./tracing/ConsoleTracer";
+import { ErrorCount } from "./errors/ErrorCount";
 import { ErrorHandler } from "./errors/ErrorHandler";
 
 import type { Observability } from "./Observability";
@@ -13,8 +14,11 @@ export class ObservabilityFactory {
 
   private static readonly tracer = new ConsoleTracer();
 
+  private static readonly errorCount = new ErrorCount();
+
   private static readonly errorHandler = new ErrorHandler(
-    ObservabilityFactory.logger
+    ObservabilityFactory.logger,
+    ObservabilityFactory.errorCount,
   );
 
   private static readonly instance: Observability = {
@@ -45,7 +49,4 @@ export class ObservabilityFactory {
   public static getInstance(): Observability {
     return ObservabilityFactory.instance;
   }
-
-  
 }
-

@@ -3,6 +3,7 @@ import type { ILogger, LogContext } from "../interfaces/ILogger";
 import type { ErrorContext } from "../types/ErrorContext";
 import type { NormalizedError } from "../types/NormalizedError";
 import { normalizeError } from "./normalizeError";
+import { ErrorCount } from "./ErrorCount";
 
 export interface HandleErrorOptions {
   readonly context?: ErrorContext;
@@ -10,7 +11,10 @@ export interface HandleErrorOptions {
 }
 
 export class ErrorHandler {
-  constructor(private readonly logger: ILogger) {}
+  constructor(
+    private readonly logger: ILogger,
+    private readonly errorCount: ErrorCount,
+  ) {}
 
   handle(
     error: unknown,
@@ -19,6 +23,9 @@ export class ErrorHandler {
     const normalized = normalizeError(error, {
       context: options.context,
     });
+
+    // Count the normalized error.
+    this.errorCount.record(normalized.code);
 
     const logContext: LogContext = {
       errorCode: normalized.code,
